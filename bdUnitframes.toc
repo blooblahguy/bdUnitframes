@@ -1,0 +1,9 @@
+## Interface: 72000
+## Title: |cffA02C2Fbd|rUnitframes
+## Version: 0
+## DefaultState: Enabled
+## LoadOnDemand: 0
+## X-oUF: oUFbdUnitframes
+## Dependencies: bdCore
+
+core.lua
