@@ -322,8 +322,10 @@ unitframes.classspecific = {
 }
 
 unitframes.specific = {
-	player = function(self)
-		self:SetPoint("RIGHT", UIParent, "CENTER", -(config.playertargetwidth/2+2), -220)
+	player = function(self,first)
+		if (first) then
+			self:SetPoint("RIGHT", UIParent, "CENTER", -(config.playertargetwidth/2+2), -220)
+		end
 		self:SetSize(config.playertargetwidth, config.playertargetheight)
 		self.Power:SetHeight(config.playertargetpowerheight)
 		
@@ -353,8 +355,21 @@ unitframes.specific = {
 		
 		local class = select(1, UnitClass("player"))
 		
+		-- buffs/aurabars
+		self.Debuffs:Hide()
+		if (config.bufftrackerstyle == "Icons") then
+			self.AuraBars:Hide()
+			self.Buffs:Show()
+		elseif (config.bufftrackerstyle == "Aurabars") then
+			self.AuraBars:Show()
+			self.Buffs:Hide()
+		else
+			self.AuraBars:Hide()
+			self.Buffs:Hide()
+		end
+		
 		self.Buffs:SetPoint("BOTTOMLEFT", self.Power, "TOPLEFT", 0, 2)
-		self.Buffs:SetSize(self.Health:GetWidth(), 40)
+		self.Buffs:SetSize(config.playertargetwidth, 40)
 		self.Buffs.size = 28
 		self.Buffs:EnableMouse(false)
 		self.Buffs.initialAnchor  = "BOTTOMLEFT"
@@ -370,19 +385,6 @@ unitframes.specific = {
 				end
 			end
 		end
-		
-		-- buffs/aurabars
-		if (config.bufftrackerstyle == "Icons") then
-			self.AuraBars:Hide()
-			self.Buffs:Show()
-		elseif (config.bufftrackerstyle == "Aurabars") then
-			self.AuraBars:Show()
-			self.Buffs:Hide()
-		else
-			self.AuraBars:Hide()
-			self.Buffs:Hide()
-		end
-		
 	
 		-- castbar
 		self.Castbar:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -bordersize)
@@ -393,20 +395,17 @@ unitframes.specific = {
 		self.Castbar.Text:SetPoint("TOPRIGHT", self.Castbar, "BOTTOMRIGHT", -2, -4)
 		self.Castbar.Text:SetJustifyH("RIGHT")
 		
-		if (unitframes.classspecific[class]) then
+		if (first and unitframes.classspecific[class]) then
 			unitframes.classspecific[class](self)
 		end
 	end,
-	target = function(self)
-		self:ClearAllPoints()
-		self:SetPoint("LEFT", UIParent, "CENTER", (config.playertargetwidth/2+2), -220)
+	target = function(self,first)
+		if (first) then
+			self:ClearAllPoints()
+			self:SetPoint("LEFT", UIParent, "CENTER", (config.playertargetwidth/2+2), -220)
+		end
 		self:SetSize(config.playertargetwidth, config.playertargetheight)
 		self.Power:SetHeight(config.playertargetpowerheight)
-		
-		if (config.bufftrackerstyle) then
-			self.AuraBars:Show()
-		end
-		
 		
 		if (config.textlocation == "Outside") then
 			self.Name:ClearAllPoints()
@@ -455,6 +454,24 @@ unitframes.specific = {
 			return allow	
 		end
 		
+		self.Debuffs.CustomFilter = function(icons, unit, something, name, rank, texture, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, _, nameplateShowAll)
+			if (bdCore:filterAura(name,caster,true)) then
+				if (caster and UnitIsUnit(caster,"player") and duration ~= 0 and duration < 300) then
+					return true 
+				end
+			end
+		end
+		-- buffs/aurabars
+		if (config.bufftrackerstyle == "Icons") then
+			self.AuraBars:Hide()
+			self.Debuffs:Show()
+		elseif (config.bufftrackerstyle == "Aurabars") then
+			self.AuraBars:Show()
+			self.Debuffs:Hide()
+		else
+			self.AuraBars:Hide()
+			self.Debuffs:Hide()
+		end
 		
 		if (config.showtargetbuffs) then
 			self.Buffs:Show()
@@ -471,8 +488,10 @@ unitframes.specific = {
 		self.Castbar.Text:SetPoint("TOPLEFT", self.Castbar, "BOTTOMLEFT", 2, -4)
 		self.Castbar.Text:SetJustifyH("LEFT")		
 	end,
-	targettarget = function(self)
-		self:SetPoint("TOPRIGHT", frames.target.Health, "BOTTOMRIGHT", 0, -config.castbarheight-2)
+	targettarget = function(self,first)
+		if (first) then
+			self:SetPoint("TOPRIGHT", frames.target.Health, "BOTTOMRIGHT", 0, -config.castbarheight-2)
+		end
 		self:SetSize(config.targetoftargetwidth, config.targetoftargetheight)
 		
 		self.Name:SetPoint('CENTER', self.Health, "CENTER", 0, 0)
@@ -486,8 +505,10 @@ unitframes.specific = {
 		self.Resting:Hide()
 		self.Castbar:Hide()
 	end,
-	focus = function(self)
-		self:SetPoint("TOP", UIParent, "TOP", 0, -30)
+	focus = function(self,first)
+		if (first) then
+			self:SetPoint("TOP", UIParent, "TOP", 0, -30)
+		end
 		self:SetSize(config.focuswidth, config.focusheight)
 		self.Health:SetSize(config.focuswidth, config.focusheight)
 		self.Power:SetHeight(config.focuspower)
@@ -508,9 +529,11 @@ unitframes.specific = {
 		self.Castbar.Icon:SetSize(config.focuscasticon, config.focuscasticon)
 		self.Castbar.Icon:SetPoint("TOP", self.Castbar, "BOTTOM",0,-6)
 	end,
-	pet = function(self)
-		self:ClearAllPoints()
-		self:SetPoint("TOPLEFT", frames.player.Health, "BOTTOMLEFT", 0, -config.castbarheight-2)
+	pet = function(self,first)
+		if (first) then
+			self:ClearAllPoints()
+			self:SetPoint("TOPLEFT", frames.player.Health, "BOTTOMLEFT", 0, -config.castbarheight-2)
+		end
 		self:SetSize(config.targetoftargetwidth, config.targetoftargetheight)
 		self.Name:SetPoint('CENTER', self.Health, "CENTER", 0, 0)
 		self.AuraBars:Hide()
@@ -520,8 +543,10 @@ unitframes.specific = {
 		self.Curhp:Hide()
 		self.Power:Hide()
 	end,
-	boss = function(self)
-		self:SetSize(config.bosswidth, config.bossheight)
+	boss = function(self,first)
+		if (first) then
+			self:SetSize(config.bosswidth, config.bossheight)
+		end
 		self.Power:SetHeight(config.bosspower)
 		self.AuraBars:Hide()
 		
@@ -671,9 +696,9 @@ function unitframes.Layout(self,unit)
 	self.Auras:SetPoint("RIGHT", self, "LEFT", -10, 0)
 	self.Auras:Hide()
 	
-	-- Buffs
+	-- Buffs / Debuffs
 	self.Buffs = CreateFrame("Frame", nil, self)
-	self.Buffs:SetSize(72, 40)
+	self.Buffs:SetSize(140, 40)
 	self.Buffs.size = 18
 	self.Buffs:EnableMouse(false)
 	self.Buffs.initialAnchor  = "BOTTOMLEFT"
@@ -684,9 +709,29 @@ function unitframes.Layout(self,unit)
 	self.Buffs.PostCreateIcon = function(Debuffs, button)
 		bdCore:setBackdrop(button)
 		button.cd:GetRegions():SetAlpha(0)
+		button.cd:SetReverse(true)
 		button.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
 		button:SetAlpha(0.8)
 	end
+	
+	self.Debuffs = CreateFrame("frame",nil,self)
+	self.Debuffs:SetSize(config.playertargetwidth, 60)
+	self.Debuffs.size = 28
+	self.Debuffs:EnableMouse(false)
+	self.Debuffs.initialAnchor  = "BOTTOMRIGHT"
+	self.Debuffs.spacing = 2
+	self.Debuffs.num = 20
+	self.Debuffs['growth-y'] = "UP"
+	self.Debuffs['growth-x'] = "LEFT"
+	self.Debuffs:SetPoint("BOTTOMRIGHT", self.Power, "TOPRIGHT", 0, 2)
+	self.Debuffs.PostCreateIcon = function(Debuffs, button)
+		bdCore:setBackdrop(button)
+		button.cd:GetRegions():SetAlpha(0)
+		button.cd:SetReverse(true)
+		button.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+		button:SetAlpha(0.8)
+	end
+	self.Debuffs:Hide()
 	
 	-- Auras
 	self.AuraBars = self.AuraBars or CreateFrame("Frame", nil, self)
@@ -829,11 +874,12 @@ function unitframes.Layout(self,unit)
 	bdframes[unit] = self
 	self:RegisterEvent("UNIT_MAXPOWER",function()
 		if(not self.ClassIcons and unitframes.specific[func]) then
-			unitframes.specific[func](self, unit)
+			unitframes.specific[func](self, false)
 		end
 	end)
+	
 	if(not self.ClassIcons and unitframes.specific[func]) then
-		unitframes.specific[func](self, unit)
+		unitframes.specific[func](self, true)
 	end
 	
 	--ClassNameplateBar
@@ -847,8 +893,23 @@ function unitframes.Layout(self,unit)
 		
 		local func = unit
 		if (string.find(func, "boss")) then func = "boss" end
+		
+		-- buffs/aurabars
+		if (config.bufftrackerstyle == "Icons") then
+			self.AuraBars:Hide()
+			self.Buffs:Show()
+			self.Debuffs:Show()
+		elseif (config.bufftrackerstyle == "Aurabars") then
+			self.AuraBars:Show()
+			self.Buffs:Hide()
+			self.Debuffs:Hide()
+		else
+			self.AuraBars:Hide()
+			self.Buffs:Hide()
+			self.Debuffs:Hide()
+		end
 
-		unitframes.specific[func](self, unit)
+		unitframes.specific[func](self, false)
 	end
 	
 	local main = self
