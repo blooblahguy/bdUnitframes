@@ -326,8 +326,10 @@ unitframes.specific = {
 		if (first) then
 			self:SetPoint("RIGHT", UIParent, "CENTER", -(config.playertargetwidth/2+2), -220)
 		end
-		self:SetSize(config.playertargetwidth, config.playertargetheight)
-		self.Power:SetHeight(config.playertargetpowerheight)
+		if (not InCombatLockdown()) then
+			self:SetSize(config.playertargetwidth, config.playertargetheight)
+			self.Power:SetHeight(config.playertargetpowerheight)
+		end
 		
 		if (config.textlocation == "Outside") then
 			self.Name:ClearAllPoints()
@@ -404,8 +406,10 @@ unitframes.specific = {
 			self:ClearAllPoints()
 			self:SetPoint("LEFT", UIParent, "CENTER", (config.playertargetwidth/2+2), -220)
 		end
-		self:SetSize(config.playertargetwidth, config.playertargetheight)
-		self.Power:SetHeight(config.playertargetpowerheight)
+		if (not InCombatLockdown()) then
+			self:SetSize(config.playertargetwidth, config.playertargetheight)
+			self.Power:SetHeight(config.playertargetpowerheight)
+		end
 		
 		if (config.textlocation == "Outside") then
 			self.Name:ClearAllPoints()
@@ -492,7 +496,9 @@ unitframes.specific = {
 		if (first) then
 			self:SetPoint("TOPRIGHT", frames.target.Health, "BOTTOMRIGHT", 0, -config.castbarheight-2)
 		end
-		self:SetSize(config.targetoftargetwidth, config.targetoftargetheight)
+		if (not InCombatLockdown()) then
+			self:SetSize(config.targetoftargetwidth, config.targetoftargetheight)
+		end
 		
 		self.Name:SetPoint('CENTER', self.Health, "CENTER", 0, 0)
 		self.RaidIcon:SetSize(8,8)
@@ -509,9 +515,11 @@ unitframes.specific = {
 		if (first) then
 			self:SetPoint("TOP", UIParent, "TOP", 0, -30)
 		end
-		self:SetSize(config.focuswidth, config.focusheight)
-		self.Health:SetSize(config.focuswidth, config.focusheight)
-		self.Power:SetHeight(config.focuspower)
+		if (not InCombatLockdown()) then
+			self:SetSize(config.focuswidth, config.focusheight)
+			self.Health:SetSize(config.focuswidth, config.focusheight)
+			self.Power:SetHeight(config.focuspower)
+		end
 		self.AuraBars:Hide()
 		
 		self.Name:SetPoint('BOTTOMLEFT', self.Power, "TOPLEFT", 4, 2)
@@ -534,8 +542,10 @@ unitframes.specific = {
 			self:ClearAllPoints()
 			self:SetPoint("TOPLEFT", frames.player.Health, "BOTTOMLEFT", 0, -config.castbarheight-2)
 		end
-		self:SetSize(config.targetoftargetwidth, config.targetoftargetheight)
-		self.Name:SetPoint('CENTER', self.Health, "CENTER", 0, 0)
+		if (not InCombatLockdown()) then
+			self:SetSize(config.targetoftargetwidth, config.targetoftargetheight)
+			self.Name:SetPoint('CENTER', self.Health, "CENTER", 0, 0)
+		end
 		self.AuraBars:Hide()
 	
 		self.Combat:Hide()
@@ -547,7 +557,9 @@ unitframes.specific = {
 		if (first) then
 			self:SetSize(config.bosswidth, config.bossheight)
 		end
-		self.Power:SetHeight(config.bosspower)
+		if (not InCombatLockdown()) then
+			self.Power:SetHeight(config.bosspower)
+		end
 		self.AuraBars:Hide()
 		
 		self.Name:SetPoint('BOTTOMLEFT', self.Power, "TOPLEFT", 4, 2)
