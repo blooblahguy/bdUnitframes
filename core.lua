@@ -228,8 +228,8 @@ if (not bdCore.modules["Personal Auras"]) then
 	bdCore:addModule("Personal Auras", bdCore.personalconfig)
 end
 --]]
-bdCore:addModule("Unit Frames", defaults)
-local config = bdCore.config["Unit Frames"]
+local config = bdCore:addModule("Unit Frames", defaults)
+--local config = bdCore.config["Unit Frames"]
 
 local function numberize(v)
 	if v <= 9999 then return v end
