@@ -214,8 +214,9 @@ defaults[#defaults+1] = {bosspower  = {
 	max = 10,
 	callback = function() bdCore:triggerEvent("unitframesUpdate") end
 }} 
+
 if (not bdCore.modules["Auras"]) then
-	bdCore:addModule("Auras", bdCore.auraconfig)
+	bdCore:addModule("Auras", bdCore.auraconfig, true)
 end
 --[[
 if (not bdCore.modules["Aura Whitelist"]) then
@@ -229,7 +230,7 @@ if (not bdCore.modules["Personal Auras"]) then
 end
 --]]
 bdCore:addModule("Unit Frames", defaults)
-local config = bdCore.config["Unit Frames"]
+local config = bdCore.config.profile['Unit Frames']
 
 local function numberize(v)
 	if v <= 9999 then return v end
@@ -253,7 +254,7 @@ local function gradient(perc)
 end
 local bossframes = {}
 local bdframes = {}
-local bordersize = bdCore.config.General.border
+local bordersize = bdCore.config.profile.General.border
 local bossanchor = CreateFrame("frame", "bdUF Boss Frame Anchor", UIParent)
 bossanchor:SetPoint("LEFT", UIParent, "LEFT", 20, 80)
 bossanchor:SetSize(200, 50)
@@ -269,7 +270,7 @@ end --]]
 
 unitframes.classspecific = {
 	Paladin = function(self)
-		local ClassIcons = {}
+		--[[local ClassIcons = {}
 		for index = 1, 5 do
 			local icon = CreateFrame('frame', nil, self)
 
@@ -289,9 +290,9 @@ unitframes.classspecific = {
 			icon:SetBackdropColor(color[1], color[2], color[3])
 
 			ClassIcons[index] = icon
-		end
+		end--]]
 		
-		self.ClassIcons = ClassIcons
+		--self.ClassIcons = ClassIcons
 	end,
 	Monk = function(self)
 		local ClassIcons = {}
@@ -400,6 +401,7 @@ unitframes.specific = {
 		if (first and unitframes.classspecific[class]) then
 			unitframes.classspecific[class](self)
 		end
+
 	end,
 	target = function(self,first)
 		if (first) then
@@ -490,7 +492,8 @@ unitframes.specific = {
 		self.Castbar.Icon:SetSize(config.castbaricon, config.castbaricon)
 		
 		self.Castbar.Text:SetPoint("TOPLEFT", self.Castbar, "BOTTOMLEFT", 2, -4)
-		self.Castbar.Text:SetJustifyH("LEFT")		
+		self.Castbar.Text:SetJustifyH("LEFT")	
+	
 	end,
 	targettarget = function(self,first)
 		if (first) then
@@ -510,6 +513,7 @@ unitframes.specific = {
 		self.Combat:Hide()
 		self.Resting:Hide()
 		self.Castbar:Hide()
+
 	end,
 	focus = function(self,first)
 		if (first) then
@@ -536,6 +540,7 @@ unitframes.specific = {
 		self.Castbar.Text:SetFont(bdCore.media.font, 14)
 		self.Castbar.Icon:SetSize(config.focuscasticon, config.focuscasticon)
 		self.Castbar.Icon:SetPoint("TOP", self.Castbar, "BOTTOM",0,-6)
+
 	end,
 	pet = function(self,first)
 		if (first) then
@@ -552,6 +557,7 @@ unitframes.specific = {
 		self.Resting:Hide()
 		self.Curhp:Hide()
 		self.Power:Hide()
+
 	end,
 	boss = function(self,first)
 		if (first) then
@@ -576,6 +582,24 @@ unitframes.specific = {
 			bossanchor:Hide()
 		end
 
+		-- Auras
+		self.Auras = CreateFrame("Frame", nil, self)
+		self.Auras:SetSize(72, 40)
+		self.Auras.size = 18
+		self.Auras:EnableMouse(false)
+		self.Auras.initialAnchor  = "BOTTOMRIGHT"
+		self.Auras.spacing = 2
+		self.Auras.num = 20
+		self.Auras['growth-y'] = "UP"
+		self.Auras['growth-x'] = "LEFT"
+		self.Auras.PostCreateIcon = function(Debuffs, button)
+			bdCore:setBackdrop(button)
+			button.cd:GetRegions():SetAlpha(0)
+			button.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+			button:SetAlpha(0.8)
+		end
+		self.Auras:SetPoint("RIGHT", self, "LEFT", -10, 0)
+		self.Auras:Hide()
 		self.Auras:Show()
 		self.Auras:SetSize(config.bossdebuffsize*4, config.bossdebuffsize*2)
 		self.Auras.size = config.bossdebuffsize
@@ -636,8 +660,8 @@ function unitframes.Layout(self,unit)
 	self.Power = CreateFrame("StatusBar", nil, self)
 	self.Power:SetStatusBarTexture(bdCore.media.flat)
 	self.Power:ClearAllPoints()
-	self.Power:SetPoint("BOTTOMLEFT", self.Health, "TOPLEFT",0, bdCore.config.General.border)
-	self.Power:SetPoint("BOTTOMRIGHT", self.Health, "TOPRIGHT",0, bdCore.config.General.border)
+	self.Power:SetPoint("BOTTOMLEFT", self.Health, "TOPLEFT",0, bdCore.config.profile.General.border)
+	self.Power:SetPoint("BOTTOMRIGHT", self.Health, "TOPRIGHT",0, bdCore.config.profile.General.border)
 	self.Power:SetHeight(config.playertargetpowerheight)
 	self.Power.frequentUpdates = true
 	self.Power.colorTapping = true
@@ -688,25 +712,6 @@ function unitframes.Layout(self,unit)
 		insideAlpha = 1,
 		outsideAlpha = .4,
 	}
-	
-	-- Auras
-	self.Auras = CreateFrame("Frame", nil, self)
-	self.Auras:SetSize(72, 40)
-	self.Auras.size = 18
-	self.Auras:EnableMouse(false)
-	self.Auras.initialAnchor  = "BOTTOMRIGHT"
-	self.Auras.spacing = 2
-	self.Auras.num = 20
-	self.Auras['growth-y'] = "UP"
-	self.Auras['growth-x'] = "LEFT"
-	self.Auras.PostCreateIcon = function(Debuffs, button)
-		bdCore:setBackdrop(button)
-		button.cd:GetRegions():SetAlpha(0)
-		button.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
-		button:SetAlpha(0.8)
-	end
-	self.Auras:SetPoint("RIGHT", self, "LEFT", -10, 0)
-	self.Auras:Hide()
 	
 	-- Buffs / Debuffs
 	self.Buffs = CreateFrame("Frame", nil, self)
@@ -856,8 +861,8 @@ function unitframes.Layout(self,unit)
 	self.Castbar.bg = self.Castbar:CreateTexture(nil, "BORDER")
 	self.Castbar.bg:SetTexture(bdCore.media.flat)
 	self.Castbar.bg:SetVertexColor(unpack(bdCore.media.border))
-	self.Castbar.bg:SetPoint("TOPLEFT", self.Castbar.Icon, "TOPLEFT", -bdCore.config.General.border, bdCore.config.General.border)
-	self.Castbar.bg:SetPoint("BOTTOMRIGHT", self.Castbar.Icon, "BOTTOMRIGHT", bdCore.config.General.border, -bdCore.config.General.border)
+	self.Castbar.bg:SetPoint("TOPLEFT", self.Castbar.Icon, "TOPLEFT", -bdCore.config.profile.General.border, bdCore.config.profile.General.border)
+	self.Castbar.bg:SetPoint("BOTTOMRIGHT", self.Castbar.Icon, "BOTTOMRIGHT", bdCore.config.profile.General.border, -bdCore.config.profile.General.border)
 	self.Castbar.SafeZone = self.Castbar:CreateTexture(nil, "OVERLAY")
 	self.Castbar.SafeZone:SetVertexColor(0.85,0.10,0.10,0.20)
 	self.Castbar.SafeZone:SetTexture(bdCore.media.flat)
@@ -897,6 +902,8 @@ function unitframes.Layout(self,unit)
 	--ClassNameplateBar
 	
 	function self.updateConfig(self)
+		config = bdCore.config.profile['Unit Frames']
+		
 		if (config.enablecastbars) then
 			self.Castbar:SetAlpha(1)
 		else
@@ -931,6 +938,7 @@ function unitframes.Layout(self,unit)
 end
 
 oUF:RegisterStyle("bdUnitFrames", unitframes.Layout)
+oUF:SetActiveStyle("bdUnitFrames")
 oUF:Factory(function(self)
 	self:SetActiveStyle("bdUnitFrames")
 	frames.player = self:Spawn("player")
