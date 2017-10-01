@@ -218,17 +218,7 @@ defaults[#defaults+1] = {bosspower  = {
 if (not bdCore.modules["Auras"]) then
 	bdCore:addModule("Auras", bdCore.auraconfig, true)
 end
---[[
-if (not bdCore.modules["Aura Whitelist"]) then
-	bdCore:addModule("Aura Whitelist", bdCore.whitelistconfig)
-end
-if (not bdCore.modules["Aura Blacklist"]) then
-	bdCore:addModule("Aura Blacklist", bdCore.blacklistconfig)
-end
-if (not bdCore.modules["Personal Auras"]) then
-	bdCore:addModule("Personal Auras", bdCore.personalconfig)
-end
---]]
+
 bdCore:addModule("Unit Frames", defaults)
 local config = bdCore.config.profile['Unit Frames']
 
