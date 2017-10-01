@@ -329,10 +329,10 @@ unitframes.specific = {
 			self.Curhp:ClearAllPoints()
 			self.Curhp:SetPoint('RIGHT', self, "LEFT", -6, -3)
 			self.Curhp:SetJustifyH("RIGHT")
-			self.Combat:ClearAllPoints()
-			self.Combat:SetPoint("RIGHT", self.Health, "RIGHT", -4, 0)
-			self.Resting:ClearAllPoints()
-			self.Resting:SetPoint("RIGHT", self.Health, "RIGHT", -4, 0)
+			self.CombatIndicator:ClearAllPoints()
+			self.CombatIndicator:SetPoint("RIGHT", self.Health, "RIGHT", -4, 0)
+			self.RestingIndicator:ClearAllPoints()
+			self.RestingIndicator:SetPoint("RIGHT", self.Health, "RIGHT", -4, 0)
 		else
 			self.Name:ClearAllPoints()
 			self.Name:SetPoint("LEFT", self, "LEFT", 6, 0)
@@ -340,10 +340,10 @@ unitframes.specific = {
 			self.Curhp:ClearAllPoints()
 			self.Curhp:SetPoint('RIGHT', self.Health, "RIGHT", -6, 0)
 			self.Curhp:SetJustifyH("RIGHT")
-			self.Combat:ClearAllPoints()
-			self.Combat:SetPoint("CENTER", self.Health, "CENTER", 0, 0)
-			self.Resting:ClearAllPoints()
-			self.Resting:SetPoint("CENTER", self.Health, "CENTER", 0, 0)
+			self.CombatIndicator:ClearAllPoints()
+			self.CombatIndicator:SetPoint("CENTER", self.Health, "CENTER", 0, 0)
+			self.RestingIndicator:ClearAllPoints()
+			self.RestingIndicator:SetPoint("CENTER", self.Health, "CENTER", 0, 0)
 		end
 		
 		local class = select(1, UnitClass("player"))
@@ -410,10 +410,10 @@ unitframes.specific = {
 			self.Curhp:ClearAllPoints()
 			self.Curhp:SetPoint('LEFT', self.Health, "RIGHT", 6, -3)
 			self.Curhp:SetJustifyH("LEFT")
-			self.Combat:ClearAllPoints()
-			self.Combat:SetPoint("RIGHT", self.Health, "RIGHT", -4, 0)
-			self.Resting:ClearAllPoints()
-			self.Resting:SetPoint("RIGHT", self.Health, "RIGHT", -4, 0)
+			self.CombatIndicator:ClearAllPoints()
+			self.CombatIndicator:SetPoint("RIGHT", self.Health, "RIGHT", -4, 0)
+			self.RestingIndicator:ClearAllPoints()
+			self.RestingIndicator:SetPoint("RIGHT", self.Health, "RIGHT", -4, 0)
 		else
 			self.Name:ClearAllPoints()
 			self.Name:SetPoint("RIGHT", self.Health, "RIGHT", -6, 0)
@@ -421,10 +421,10 @@ unitframes.specific = {
 			self.Curhp:ClearAllPoints()
 			self.Curhp:SetPoint('LEFT', self.Health, "LEFT", 6, 0)
 			self.Curhp:SetJustifyH("LEFT")
-			self.Combat:ClearAllPoints()
-			self.Combat:SetPoint("CENTER", self.Health, "CENTER", 0, 0)
-			self.Resting:ClearAllPoints()
-			self.Resting:SetPoint("CENTER", self.Health, "CENTER", 0, 0)
+			self.CombatIndicator:ClearAllPoints()
+			self.CombatIndicator:SetPoint("CENTER", self.Health, "CENTER", 0, 0)
+			self.RestingIndicator:ClearAllPoints()
+			self.RestingIndicator:SetPoint("CENTER", self.Health, "CENTER", 0, 0)
 		end
 		
 		self.Buffs:ClearAllPoints()
@@ -494,14 +494,14 @@ unitframes.specific = {
 		end
 		
 		self.Name:SetPoint('CENTER', self.Health, "CENTER", 0, 0)
-		self.RaidIcon:SetSize(8,8)
-		self.RaidIcon:SetPoint("LEFT", self.Health, 2,0)
+		self.RaidTargetIndicator:SetSize(8,8)
+		self.RaidTargetIndicator:SetPoint("LEFT", self.Health, 2,0)
 		self.AuraBars:Hide()
 		
 		self.Power:Hide()
 		self.Curhp:Hide()
-		self.Combat:Hide()
-		self.Resting:Hide()
+		self.ComCombatIndicatorbat:Hide()
+		self.RestingIndicator:Hide()
 		self.Castbar:Hide()
 
 	end,
@@ -519,8 +519,8 @@ unitframes.specific = {
 		self.Name:SetPoint('BOTTOMLEFT', self.Power, "TOPLEFT", 4, 2)
 		self.Curhp:SetPoint('BOTTOMRIGHT', self.Power, "TOPRIGHT", -4, 2)
 
-		self.Combat:Hide()
-		self.Resting:Hide()
+		self.CombatIndicator:Hide()
+		self.RestingIndicator:Hide()
 		
 		self.Castbar:SetPoint("TOP", UIParent, "TOP", 0, -80)
 		self.Castbar:SetSize(config.focuscastwidth, config.focuscastheight)
@@ -543,7 +543,7 @@ unitframes.specific = {
 		end
 		self.AuraBars:Hide()
 	
-		self.Combat:Hide()
+		self.CombatIndicator:Hide()
 		self.Resting:Hide()
 		self.Curhp:Hide()
 		self.Power:Hide()
@@ -561,7 +561,7 @@ unitframes.specific = {
 		self.Name:SetPoint('BOTTOMLEFT', self.Power, "TOPLEFT", 4, 2)
 		self.Curhp:SetPoint('BOTTOMRIGHT', self.Power, "TOPRIGHT", -4, 2)
 		
-		self.Combat:Hide()
+		self.CombatIndicator:Hide()
 		
 		--self.Buffs:ClearAllPoints()
 		--self.Buffs:SetPoint("LEFT", self.Power, "RIGHT", 8, 0)
@@ -688,14 +688,14 @@ function unitframes.Layout(self,unit)
 	NamePlateTargetResourceFrame.Hide = function(self,...) end--]]
 	
 	-- Combat indicator
-	self.Combat = self.Health:CreateTexture(nil, "OVERLAY")
-	self.Combat:SetSize(16, 16)
-	self.Combat:SetPoint('LEFT', self.Health, 2, 0)
+	self.CombatIndicator = self.Health:CreateTexture(nil, "OVERLAY")
+	self.CombatIndicator:SetSize(16, 16)
+	self.CombatIndicator:SetPoint('LEFT', self.Health, 2, 0)
 	
 	-- Resting indicator
-	self.Resting = self.Health:CreateTexture(nil, "OVERLAY")
-	self.Resting:SetSize(16, 16)
-	self.Resting:SetPoint('LEFT', self.Health, 2, 0)
+	self.RestingIndicator = self.Health:CreateTexture(nil, "OVERLAY")
+	self.RestingIndicator:SetSize(16, 16)
+	self.RestingIndicator:SetPoint('LEFT', self.Health, 2, 0)
 	
 	-- Range
 	self.Range = {
@@ -776,9 +776,9 @@ function unitframes.Layout(self,unit)
 	end
 	
 	-- Raid Icon
-	self.RaidIcon = self.Health:CreateTexture(nil, "OVERLAY", nil, 1)
-	self.RaidIcon:SetSize(12, 12)
-	self.RaidIcon:SetPoint('CENTER', self, 0, 0)
+	self.RaidTargetIndicator = self.Health:CreateTexture(nil, "OVERLAY", nil, 1)
+	self.RaidTargetIndicator:SetSize(12, 12)
+	self.RaidTargetIndicator:SetPoint('CENTER', self, 0, 0)
 	
 	-- Absorb
 	self.TotalAbsorb = CreateFrame('StatusBar', nil, self.Health)
