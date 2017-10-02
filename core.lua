@@ -500,7 +500,7 @@ unitframes.specific = {
 		
 		self.Power:Hide()
 		self.Curhp:Hide()
-		self.ComCombatIndicatorbat:Hide()
+		self.CombatIndicator:Hide()
 		self.RestingIndicator:Hide()
 		self.Castbar:Hide()
 
@@ -544,7 +544,7 @@ unitframes.specific = {
 		self.AuraBars:Hide()
 	
 		self.CombatIndicator:Hide()
-		self.Resting:Hide()
+		self.RestingIndicator:Hide()
 		self.Curhp:Hide()
 		self.Power:Hide()
 
