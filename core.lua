@@ -214,22 +214,13 @@ defaults[#defaults+1] = {bosspower  = {
 	max = 10,
 	callback = function() bdCore:triggerEvent("unitframesUpdate") end
 }} 
+
 if (not bdCore.modules["Auras"]) then
-	bdCore:addModule("Auras", bdCore.auraconfig)
+	bdCore:addModule("Auras", bdCore.auraconfig, true)
 end
---[[
-if (not bdCore.modules["Aura Whitelist"]) then
-	bdCore:addModule("Aura Whitelist", bdCore.whitelistconfig)
-end
-if (not bdCore.modules["Aura Blacklist"]) then
-	bdCore:addModule("Aura Blacklist", bdCore.blacklistconfig)
-end
-if (not bdCore.modules["Personal Auras"]) then
-	bdCore:addModule("Personal Auras", bdCore.personalconfig)
-end
---]]
-local config = bdCore:addModule("Unit Frames", defaults)
---local config = bdCore.config["Unit Frames"]
+
+bdCore:addModule("Unit Frames", defaults)
+local config = bdCore.config.profile['Unit Frames']
 
 local function numberize(v)
 	if v <= 9999 then return v end
@@ -253,7 +244,7 @@ local function gradient(perc)
 end
 local bossframes = {}
 local bdframes = {}
-local bordersize = bdCore.config.General.border
+local bordersize = bdCore.config.persistent.General.border
 local bossanchor = CreateFrame("frame", "bdUF Boss Frame Anchor", UIParent)
 bossanchor:SetPoint("LEFT", UIParent, "LEFT", 20, 80)
 bossanchor:SetSize(200, 50)
@@ -269,7 +260,7 @@ end --]]
 
 unitframes.classspecific = {
 	Paladin = function(self)
-		local ClassIcons = {}
+		--[[local ClassIcons = {}
 		for index = 1, 5 do
 			local icon = CreateFrame('frame', nil, self)
 
@@ -289,9 +280,9 @@ unitframes.classspecific = {
 			icon:SetBackdropColor(color[1], color[2], color[3])
 
 			ClassIcons[index] = icon
-		end
+		end--]]
 		
-		self.ClassIcons = ClassIcons
+		--self.ClassIcons = ClassIcons
 	end,
 	Monk = function(self)
 		local ClassIcons = {}
@@ -322,10 +313,14 @@ unitframes.classspecific = {
 }
 
 unitframes.specific = {
-	player = function(self)
-		self:SetPoint("RIGHT", UIParent, "CENTER", -(config.playertargetwidth/2+2), -220)
-		self:SetSize(config.playertargetwidth, config.playertargetheight)
-		self.Power:SetHeight(config.playertargetpowerheight)
+	player = function(self,first)
+		if (first) then
+			self:SetPoint("RIGHT", UIParent, "CENTER", -(config.playertargetwidth/2+2), -220)
+		end
+		if (not InCombatLockdown()) then
+			self:SetSize(config.playertargetwidth, config.playertargetheight)
+			self.Power:SetHeight(config.playertargetpowerheight)
+		end
 		
 		if (config.textlocation == "Outside") then
 			self.Name:ClearAllPoints()
@@ -334,10 +329,10 @@ unitframes.specific = {
 			self.Curhp:ClearAllPoints()
 			self.Curhp:SetPoint('RIGHT', self, "LEFT", -6, -3)
 			self.Curhp:SetJustifyH("RIGHT")
-			self.Combat:ClearAllPoints()
-			self.Combat:SetPoint("RIGHT", self.Health, "RIGHT", -4, 0)
-			self.Resting:ClearAllPoints()
-			self.Resting:SetPoint("RIGHT", self.Health, "RIGHT", -4, 0)
+			self.CombatIndicator:ClearAllPoints()
+			self.CombatIndicator:SetPoint("RIGHT", self.Health, "RIGHT", -4, 0)
+			self.RestingIndicator:ClearAllPoints()
+			self.RestingIndicator:SetPoint("RIGHT", self.Health, "RIGHT", -4, 0)
 		else
 			self.Name:ClearAllPoints()
 			self.Name:SetPoint("LEFT", self, "LEFT", 6, 0)
@@ -345,16 +340,29 @@ unitframes.specific = {
 			self.Curhp:ClearAllPoints()
 			self.Curhp:SetPoint('RIGHT', self.Health, "RIGHT", -6, 0)
 			self.Curhp:SetJustifyH("RIGHT")
-			self.Combat:ClearAllPoints()
-			self.Combat:SetPoint("CENTER", self.Health, "CENTER", 0, 0)
-			self.Resting:ClearAllPoints()
-			self.Resting:SetPoint("CENTER", self.Health, "CENTER", 0, 0)
+			self.CombatIndicator:ClearAllPoints()
+			self.CombatIndicator:SetPoint("CENTER", self.Health, "CENTER", 0, 0)
+			self.RestingIndicator:ClearAllPoints()
+			self.RestingIndicator:SetPoint("CENTER", self.Health, "CENTER", 0, 0)
 		end
 		
 		local class = select(1, UnitClass("player"))
 		
+		-- buffs/aurabars
+		self.Debuffs:Hide()
+		if (config.bufftrackerstyle == "Icons") then
+			self.AuraBars:Hide()
+			self.Buffs:Show()
+		elseif (config.bufftrackerstyle == "Aurabars") then
+			self.AuraBars:Show()
+			self.Buffs:Hide()
+		else
+			self.AuraBars:Hide()
+			self.Buffs:Hide()
+		end
+		
 		self.Buffs:SetPoint("BOTTOMLEFT", self.Power, "TOPLEFT", 0, 2)
-		self.Buffs:SetSize(self.Health:GetWidth(), 40)
+		self.Buffs:SetSize(config.playertargetwidth, 40)
 		self.Buffs.size = 28
 		self.Buffs:EnableMouse(false)
 		self.Buffs.initialAnchor  = "BOTTOMLEFT"
@@ -370,19 +378,6 @@ unitframes.specific = {
 				end
 			end
 		end
-		
-		-- buffs/aurabars
-		if (config.bufftrackerstyle == "Icons") then
-			self.AuraBars:Hide()
-			self.Buffs:Show()
-		elseif (config.bufftrackerstyle == "Aurabars") then
-			self.AuraBars:Show()
-			self.Buffs:Hide()
-		else
-			self.AuraBars:Hide()
-			self.Buffs:Hide()
-		end
-		
 	
 		-- castbar
 		self.Castbar:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -bordersize)
@@ -393,20 +388,20 @@ unitframes.specific = {
 		self.Castbar.Text:SetPoint("TOPRIGHT", self.Castbar, "BOTTOMRIGHT", -2, -4)
 		self.Castbar.Text:SetJustifyH("RIGHT")
 		
-		if (unitframes.classspecific[class]) then
+		if (first and unitframes.classspecific[class]) then
 			unitframes.classspecific[class](self)
 		end
+
 	end,
-	target = function(self)
-		self:ClearAllPoints()
-		self:SetPoint("LEFT", UIParent, "CENTER", (config.playertargetwidth/2+2), -220)
-		self:SetSize(config.playertargetwidth, config.playertargetheight)
-		self.Power:SetHeight(config.playertargetpowerheight)
-		
-		if (config.bufftrackerstyle) then
-			self.AuraBars:Show()
+	target = function(self,first)
+		if (first) then
+			self:ClearAllPoints()
+			self:SetPoint("LEFT", UIParent, "CENTER", (config.playertargetwidth/2+2), -220)
 		end
-		
+		if (not InCombatLockdown()) then
+			self:SetSize(config.playertargetwidth, config.playertargetheight)
+			self.Power:SetHeight(config.playertargetpowerheight)
+		end
 		
 		if (config.textlocation == "Outside") then
 			self.Name:ClearAllPoints()
@@ -415,10 +410,10 @@ unitframes.specific = {
 			self.Curhp:ClearAllPoints()
 			self.Curhp:SetPoint('LEFT', self.Health, "RIGHT", 6, -3)
 			self.Curhp:SetJustifyH("LEFT")
-			self.Combat:ClearAllPoints()
-			self.Combat:SetPoint("RIGHT", self.Health, "RIGHT", -4, 0)
-			self.Resting:ClearAllPoints()
-			self.Resting:SetPoint("RIGHT", self.Health, "RIGHT", -4, 0)
+			self.CombatIndicator:ClearAllPoints()
+			self.CombatIndicator:SetPoint("RIGHT", self.Health, "RIGHT", -4, 0)
+			self.RestingIndicator:ClearAllPoints()
+			self.RestingIndicator:SetPoint("RIGHT", self.Health, "RIGHT", -4, 0)
 		else
 			self.Name:ClearAllPoints()
 			self.Name:SetPoint("RIGHT", self.Health, "RIGHT", -6, 0)
@@ -426,10 +421,10 @@ unitframes.specific = {
 			self.Curhp:ClearAllPoints()
 			self.Curhp:SetPoint('LEFT', self.Health, "LEFT", 6, 0)
 			self.Curhp:SetJustifyH("LEFT")
-			self.Combat:ClearAllPoints()
-			self.Combat:SetPoint("CENTER", self.Health, "CENTER", 0, 0)
-			self.Resting:ClearAllPoints()
-			self.Resting:SetPoint("CENTER", self.Health, "CENTER", 0, 0)
+			self.CombatIndicator:ClearAllPoints()
+			self.CombatIndicator:SetPoint("CENTER", self.Health, "CENTER", 0, 0)
+			self.RestingIndicator:ClearAllPoints()
+			self.RestingIndicator:SetPoint("CENTER", self.Health, "CENTER", 0, 0)
 		end
 		
 		self.Buffs:ClearAllPoints()
@@ -455,6 +450,24 @@ unitframes.specific = {
 			return allow	
 		end
 		
+		self.Debuffs.CustomFilter = function(icons, unit, something, name, rank, texture, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, _, nameplateShowAll)
+			if (bdCore:filterAura(name,caster,true)) then
+				if (caster and UnitIsUnit(caster,"player") and duration ~= 0 and duration < 300) then
+					return true 
+				end
+			end
+		end
+		-- buffs/aurabars
+		if (config.bufftrackerstyle == "Icons") then
+			self.AuraBars:Hide()
+			self.Debuffs:Show()
+		elseif (config.bufftrackerstyle == "Aurabars") then
+			self.AuraBars:Show()
+			self.Debuffs:Hide()
+		else
+			self.AuraBars:Hide()
+			self.Debuffs:Hide()
+		end
 		
 		if (config.showtargetbuffs) then
 			self.Buffs:Show()
@@ -469,35 +482,45 @@ unitframes.specific = {
 		self.Castbar.Icon:SetSize(config.castbaricon, config.castbaricon)
 		
 		self.Castbar.Text:SetPoint("TOPLEFT", self.Castbar, "BOTTOMLEFT", 2, -4)
-		self.Castbar.Text:SetJustifyH("LEFT")		
+		self.Castbar.Text:SetJustifyH("LEFT")	
+	
 	end,
-	targettarget = function(self)
-		self:SetPoint("TOPRIGHT", frames.target.Health, "BOTTOMRIGHT", 0, -config.castbarheight-2)
-		self:SetSize(config.targetoftargetwidth, config.targetoftargetheight)
+	targettarget = function(self,first)
+		if (first) then
+			self:SetPoint("TOPRIGHT", frames.target.Health, "BOTTOMRIGHT", 0, -config.castbarheight-2)
+		end
+		if (not InCombatLockdown()) then
+			self:SetSize(config.targetoftargetwidth, config.targetoftargetheight)
+		end
 		
 		self.Name:SetPoint('CENTER', self.Health, "CENTER", 0, 0)
-		self.RaidIcon:SetSize(8,8)
-		self.RaidIcon:SetPoint("LEFT", self.Health, 2,0)
+		self.RaidTargetIndicator:SetSize(8,8)
+		self.RaidTargetIndicator:SetPoint("LEFT", self.Health, 2,0)
 		self.AuraBars:Hide()
 		
 		self.Power:Hide()
 		self.Curhp:Hide()
-		self.Combat:Hide()
-		self.Resting:Hide()
+		self.CombatIndicator:Hide()
+		self.RestingIndicator:Hide()
 		self.Castbar:Hide()
+
 	end,
-	focus = function(self)
-		self:SetPoint("TOP", UIParent, "TOP", 0, -30)
-		self:SetSize(config.focuswidth, config.focusheight)
-		self.Health:SetSize(config.focuswidth, config.focusheight)
-		self.Power:SetHeight(config.focuspower)
+	focus = function(self,first)
+		if (first) then
+			self:SetPoint("TOP", UIParent, "TOP", 0, -30)
+		end
+		if (not InCombatLockdown()) then
+			self:SetSize(config.focuswidth, config.focusheight)
+			self.Health:SetSize(config.focuswidth, config.focusheight)
+			self.Power:SetHeight(config.focuspower)
+		end
 		self.AuraBars:Hide()
 		
 		self.Name:SetPoint('BOTTOMLEFT', self.Power, "TOPLEFT", 4, 2)
 		self.Curhp:SetPoint('BOTTOMRIGHT', self.Power, "TOPRIGHT", -4, 2)
 
-		self.Combat:Hide()
-		self.Resting:Hide()
+		self.CombatIndicator:Hide()
+		self.RestingIndicator:Hide()
 		
 		self.Castbar:SetPoint("TOP", UIParent, "TOP", 0, -80)
 		self.Castbar:SetSize(config.focuscastwidth, config.focuscastheight)
@@ -507,28 +530,38 @@ unitframes.specific = {
 		self.Castbar.Text:SetFont(bdCore.media.font, 14)
 		self.Castbar.Icon:SetSize(config.focuscasticon, config.focuscasticon)
 		self.Castbar.Icon:SetPoint("TOP", self.Castbar, "BOTTOM",0,-6)
+
 	end,
-	pet = function(self)
-		self:ClearAllPoints()
-		self:SetPoint("TOPLEFT", frames.player.Health, "BOTTOMLEFT", 0, -config.castbarheight-2)
-		self:SetSize(config.targetoftargetwidth, config.targetoftargetheight)
-		self.Name:SetPoint('CENTER', self.Health, "CENTER", 0, 0)
+	pet = function(self,first)
+		if (first) then
+			self:ClearAllPoints()
+			self:SetPoint("TOPLEFT", frames.player.Health, "BOTTOMLEFT", 0, -config.castbarheight-2)
+		end
+		if (not InCombatLockdown()) then
+			self:SetSize(config.targetoftargetwidth, config.targetoftargetheight)
+			self.Name:SetPoint('CENTER', self.Health, "CENTER", 0, 0)
+		end
 		self.AuraBars:Hide()
 	
-		self.Combat:Hide()
-		self.Resting:Hide()
+		self.CombatIndicator:Hide()
+		self.RestingIndicator:Hide()
 		self.Curhp:Hide()
 		self.Power:Hide()
+
 	end,
-	boss = function(self)
-		self:SetSize(config.bosswidth, config.bossheight)
-		self.Power:SetHeight(config.bosspower)
+	boss = function(self,first)
+		if (first) then
+			self:SetSize(config.bosswidth, config.bossheight)
+		end
+		if (not InCombatLockdown()) then
+			self.Power:SetHeight(config.bosspower)
+		end
 		self.AuraBars:Hide()
 		
 		self.Name:SetPoint('BOTTOMLEFT', self.Power, "TOPLEFT", 4, 2)
 		self.Curhp:SetPoint('BOTTOMRIGHT', self.Power, "TOPRIGHT", -4, 2)
 		
-		self.Combat:Hide()
+		self.CombatIndicator:Hide()
 		
 		--self.Buffs:ClearAllPoints()
 		--self.Buffs:SetPoint("LEFT", self.Power, "RIGHT", 8, 0)
@@ -539,6 +572,24 @@ unitframes.specific = {
 			bossanchor:Hide()
 		end
 
+		-- Auras
+		self.Auras = CreateFrame("Frame", nil, self)
+		self.Auras:SetSize(72, 40)
+		self.Auras.size = 18
+		self.Auras:EnableMouse(false)
+		self.Auras.initialAnchor  = "BOTTOMRIGHT"
+		self.Auras.spacing = 2
+		self.Auras.num = 20
+		self.Auras['growth-y'] = "UP"
+		self.Auras['growth-x'] = "LEFT"
+		self.Auras.PostCreateIcon = function(Debuffs, button)
+			bdCore:setBackdrop(button)
+			button.cd:GetRegions():SetAlpha(0)
+			button.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+			button:SetAlpha(0.8)
+		end
+		self.Auras:SetPoint("RIGHT", self, "LEFT", -10, 0)
+		self.Auras:Hide()
 		self.Auras:Show()
 		self.Auras:SetSize(config.bossdebuffsize*4, config.bossdebuffsize*2)
 		self.Auras.size = config.bossdebuffsize
@@ -599,8 +650,8 @@ function unitframes.Layout(self,unit)
 	self.Power = CreateFrame("StatusBar", nil, self)
 	self.Power:SetStatusBarTexture(bdCore.media.flat)
 	self.Power:ClearAllPoints()
-	self.Power:SetPoint("BOTTOMLEFT", self.Health, "TOPLEFT",0, bdCore.config.General.border)
-	self.Power:SetPoint("BOTTOMRIGHT", self.Health, "TOPRIGHT",0, bdCore.config.General.border)
+	self.Power:SetPoint("BOTTOMLEFT", self.Health, "TOPLEFT",0, bdCore.config.persistent.General.border)
+	self.Power:SetPoint("BOTTOMRIGHT", self.Health, "TOPRIGHT",0, bdCore.config.persistent.General.border)
 	self.Power:SetHeight(config.playertargetpowerheight)
 	self.Power.frequentUpdates = true
 	self.Power.colorTapping = true
@@ -637,14 +688,14 @@ function unitframes.Layout(self,unit)
 	NamePlateTargetResourceFrame.Hide = function(self,...) end--]]
 	
 	-- Combat indicator
-	self.Combat = self.Health:CreateTexture(nil, "OVERLAY")
-	self.Combat:SetSize(16, 16)
-	self.Combat:SetPoint('LEFT', self.Health, 2, 0)
+	self.CombatIndicator = self.Health:CreateTexture(nil, "OVERLAY")
+	self.CombatIndicator:SetSize(16, 16)
+	self.CombatIndicator:SetPoint('LEFT', self.Health, 2, 0)
 	
 	-- Resting indicator
-	self.Resting = self.Health:CreateTexture(nil, "OVERLAY")
-	self.Resting:SetSize(16, 16)
-	self.Resting:SetPoint('LEFT', self.Health, 2, 0)
+	self.RestingIndicator = self.Health:CreateTexture(nil, "OVERLAY")
+	self.RestingIndicator:SetSize(16, 16)
+	self.RestingIndicator:SetPoint('LEFT', self.Health, 2, 0)
 	
 	-- Range
 	self.Range = {
@@ -652,28 +703,9 @@ function unitframes.Layout(self,unit)
 		outsideAlpha = .4,
 	}
 	
-	-- Auras
-	self.Auras = CreateFrame("Frame", nil, self)
-	self.Auras:SetSize(72, 40)
-	self.Auras.size = 18
-	self.Auras:EnableMouse(false)
-	self.Auras.initialAnchor  = "BOTTOMRIGHT"
-	self.Auras.spacing = 2
-	self.Auras.num = 20
-	self.Auras['growth-y'] = "UP"
-	self.Auras['growth-x'] = "LEFT"
-	self.Auras.PostCreateIcon = function(Debuffs, button)
-		bdCore:setBackdrop(button)
-		button.cd:GetRegions():SetAlpha(0)
-		button.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
-		button:SetAlpha(0.8)
-	end
-	self.Auras:SetPoint("RIGHT", self, "LEFT", -10, 0)
-	self.Auras:Hide()
-	
-	-- Buffs
+	-- Buffs / Debuffs
 	self.Buffs = CreateFrame("Frame", nil, self)
-	self.Buffs:SetSize(72, 40)
+	self.Buffs:SetSize(140, 40)
 	self.Buffs.size = 18
 	self.Buffs:EnableMouse(false)
 	self.Buffs.initialAnchor  = "BOTTOMLEFT"
@@ -684,9 +716,29 @@ function unitframes.Layout(self,unit)
 	self.Buffs.PostCreateIcon = function(Debuffs, button)
 		bdCore:setBackdrop(button)
 		button.cd:GetRegions():SetAlpha(0)
+		button.cd:SetReverse(true)
 		button.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
 		button:SetAlpha(0.8)
 	end
+	
+	self.Debuffs = CreateFrame("frame",nil,self)
+	self.Debuffs:SetSize(config.playertargetwidth, 60)
+	self.Debuffs.size = 28
+	self.Debuffs:EnableMouse(false)
+	self.Debuffs.initialAnchor  = "BOTTOMRIGHT"
+	self.Debuffs.spacing = 2
+	self.Debuffs.num = 20
+	self.Debuffs['growth-y'] = "UP"
+	self.Debuffs['growth-x'] = "LEFT"
+	self.Debuffs:SetPoint("BOTTOMRIGHT", self.Power, "TOPRIGHT", 0, 2)
+	self.Debuffs.PostCreateIcon = function(Debuffs, button)
+		bdCore:setBackdrop(button)
+		button.cd:GetRegions():SetAlpha(0)
+		button.cd:SetReverse(true)
+		button.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+		button:SetAlpha(0.8)
+	end
+	self.Debuffs:Hide()
 	
 	-- Auras
 	self.AuraBars = self.AuraBars or CreateFrame("Frame", nil, self)
@@ -724,9 +776,9 @@ function unitframes.Layout(self,unit)
 	end
 	
 	-- Raid Icon
-	self.RaidIcon = self.Health:CreateTexture(nil, "OVERLAY", nil, 1)
-	self.RaidIcon:SetSize(12, 12)
-	self.RaidIcon:SetPoint('CENTER', self, 0, 0)
+	self.RaidTargetIndicator = self.Health:CreateTexture(nil, "OVERLAY", nil, 1)
+	self.RaidTargetIndicator:SetSize(12, 12)
+	self.RaidTargetIndicator:SetPoint('CENTER', self, 0, 0)
 	
 	-- Absorb
 	self.TotalAbsorb = CreateFrame('StatusBar', nil, self.Health)
@@ -799,8 +851,8 @@ function unitframes.Layout(self,unit)
 	self.Castbar.bg = self.Castbar:CreateTexture(nil, "BORDER")
 	self.Castbar.bg:SetTexture(bdCore.media.flat)
 	self.Castbar.bg:SetVertexColor(unpack(bdCore.media.border))
-	self.Castbar.bg:SetPoint("TOPLEFT", self.Castbar.Icon, "TOPLEFT", -bdCore.config.General.border, bdCore.config.General.border)
-	self.Castbar.bg:SetPoint("BOTTOMRIGHT", self.Castbar.Icon, "BOTTOMRIGHT", bdCore.config.General.border, -bdCore.config.General.border)
+	self.Castbar.bg:SetPoint("TOPLEFT", self.Castbar.Icon, "TOPLEFT", -bdCore.config.persistent.General.border, bdCore.config.persistent.General.border)
+	self.Castbar.bg:SetPoint("BOTTOMRIGHT", self.Castbar.Icon, "BOTTOMRIGHT", bdCore.config.persistent.General.border, -bdCore.config.persistent.General.border)
 	self.Castbar.SafeZone = self.Castbar:CreateTexture(nil, "OVERLAY")
 	self.Castbar.SafeZone:SetVertexColor(0.85,0.10,0.10,0.20)
 	self.Castbar.SafeZone:SetTexture(bdCore.media.flat)
@@ -829,16 +881,19 @@ function unitframes.Layout(self,unit)
 	bdframes[unit] = self
 	self:RegisterEvent("UNIT_MAXPOWER",function()
 		if(not self.ClassIcons and unitframes.specific[func]) then
-			unitframes.specific[func](self, unit)
+			unitframes.specific[func](self, false)
 		end
 	end)
+	
 	if(not self.ClassIcons and unitframes.specific[func]) then
-		unitframes.specific[func](self, unit)
+		unitframes.specific[func](self, true)
 	end
 	
 	--ClassNameplateBar
 	
 	function self.updateConfig(self)
+		config = bdCore.config.profile['Unit Frames']
+		
 		if (config.enablecastbars) then
 			self.Castbar:SetAlpha(1)
 		else
@@ -847,8 +902,23 @@ function unitframes.Layout(self,unit)
 		
 		local func = unit
 		if (string.find(func, "boss")) then func = "boss" end
+		
+		-- buffs/aurabars
+		if (config.bufftrackerstyle == "Icons") then
+			self.AuraBars:Hide()
+			self.Buffs:Show()
+			self.Debuffs:Show()
+		elseif (config.bufftrackerstyle == "Aurabars") then
+			self.AuraBars:Show()
+			self.Buffs:Hide()
+			self.Debuffs:Hide()
+		else
+			self.AuraBars:Hide()
+			self.Buffs:Hide()
+			self.Debuffs:Hide()
+		end
 
-		unitframes.specific[func](self, unit)
+		unitframes.specific[func](self, false)
 	end
 	
 	local main = self
@@ -858,6 +928,7 @@ function unitframes.Layout(self,unit)
 end
 
 oUF:RegisterStyle("bdUnitFrames", unitframes.Layout)
+oUF:SetActiveStyle("bdUnitFrames")
 oUF:Factory(function(self)
 	self:SetActiveStyle("bdUnitFrames")
 	frames.player = self:Spawn("player")
