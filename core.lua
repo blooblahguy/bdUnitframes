@@ -263,7 +263,7 @@ local function gradient(perc)
 end
 
 local bdframes = {}
-local bossanchor = CreateFrame("frame", "bdUF Boss Frame Anchor", UIParent)
+local bossanchor = CreateFrame("frame", UIParent, "bdUF Boss Frame Anchor")
 bossanchor:SetPoint("LEFT", UIParent, "LEFT", 20, 80)
 bossanchor:SetSize(200, 50)
 local bordersize = bdCore.config.persistent.General.border
@@ -540,6 +540,12 @@ unitframes.specific = {
 		function self:callback()
 			if (not InCombatLockdown()) then
 				self:SetSize(config.bosswidth, config.bossheight)
+
+				-- boss frame
+				bossanchor:Show()
+				if (not config.bossenable) then
+					bossanchor:Hide()
+				end
 			end
 
 			self.Power:SetHeight(config.bosspower)
@@ -607,12 +613,6 @@ unitframes.specific = {
 
 local function updateConfig()
 	config = bdCore.config.profile['Unit Frames']
-
-	-- boss frame
-	bossanchor:Show()
-	if (not config.bossenable) then
-		bossanchor:Hide()
-	end
 	
 	-- loop through our frames
 	for unit, frame in pairs(bdframes) do
