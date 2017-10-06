@@ -271,7 +271,7 @@ local bordersize = bdCore.config.persistent.General.border
 unitframes.specific = {
 	player = function(self)
 		-- update function
-		bdCore:hookEvent("unitframesUpdate", function(self)
+		function self:callback()
 			if (not InCombatLockdown()) then
 				self:SetSize(config.playertargetwidth, config.playertargetheight)
 			end
@@ -323,7 +323,9 @@ unitframes.specific = {
 			self.Castbar.Icon:SetSize(config.castbaricon, config.castbaricon)
 			self.Castbar.Text:SetPoint("TOPRIGHT", self.Castbar, "BOTTOMRIGHT", -2, -4)
 			self.Castbar.Text:SetJustifyH("RIGHT")
-		end)
+		end
+		local main = self
+		bdCore:hookEvent("unitframesUpdate", function() main:callback() end)
 
 		-- config buffs
 		self.Buffs:SetPoint("BOTTOMLEFT", self.Power, "TOPLEFT", 0, 2)
@@ -376,7 +378,7 @@ unitframes.specific = {
 	end,
 	target = function(self)
 		-- update function
-		bdCore:hookEvent("unitframesUpdate", function(self)
+		function self:callback()
 			-- secure for self	
 			if (not InCombatLockdown()) then
 				self:SetSize(config.playertargetwidth, config.playertargetheight)
@@ -415,7 +417,9 @@ unitframes.specific = {
 			else
 				self.Buffs:Hide()
 			end
-		end)
+		end
+		local main = self
+		bdCore:hookEvent("unitframesUpdate", function() main:callback() end)
 		
 		-- buffs
 		self.Buffs:ClearAllPoints()
@@ -459,11 +463,13 @@ unitframes.specific = {
 	end,
 	targettarget = function(self)
 		-- update function
-		bdCore:hookEvent("unitframesUpdate", function(self)
+		function self:callback()
 			if (not InCombatLockdown()) then
 				self:SetSize(config.targetoftargetwidth, config.targetoftargetheight)
 			end
-		end)
+		end
+		local main = self
+		bdCore:hookEvent("unitframesUpdate", function() main:callback() end)
 		
 		self.Name:SetPoint('CENTER', self.Health, "CENTER", 0, 0)
 		self.RaidTargetIndicator:SetSize(8,8)
@@ -481,7 +487,7 @@ unitframes.specific = {
 	end,
 	focus = function(self)
 		-- update function
-		bdCore:hookEvent("unitframesUpdate", function(self)
+		function self:callback()
 			if (not InCombatLockdown()) then
 				self:SetSize(config.focuswidth, config.focusheight)
 			end
@@ -491,7 +497,9 @@ unitframes.specific = {
 
 			self.Castbar:SetSize(config.focuscastwidth, config.focuscastheight)
 			self.Castbar.Icon:SetSize(config.focuscasticon, config.focuscasticon)
-		end)
+		end
+		local main = self
+		bdCore:hookEvent("unitframesUpdate", function() main:callback() end)
 		
 		self.Name:SetPoint('BOTTOMLEFT', self.Power, "TOPLEFT", 4, 2)
 		self.Curhp:SetPoint('BOTTOMRIGHT', self.Power, "TOPRIGHT", -4, 2)
@@ -510,11 +518,13 @@ unitframes.specific = {
 	end,
 	pet = function(self)
 		-- update function
-		bdCore:hookEvent("unitframesUpdate", function(self)	
+		function self:callback()
 			if (not InCombatLockdown()) then
 				self:SetSize(config.targetoftargetwidth, config.targetoftargetheight)
 			end
-		end)
+		end
+		local main = self
+		bdCore:hookEvent("unitframesUpdate", function() main:callback() end)
 
 		self.Name:SetPoint('CENTER', self.Health, "CENTER", 0, 0)
 
@@ -527,7 +537,7 @@ unitframes.specific = {
 	end,
 	boss = function(self)
 		-- update function
-		bdCore:hookEvent("unitframesUpdate", function(self)
+		function self:callback()
 			if (not InCombatLockdown()) then
 				self:SetSize(config.bosswidth, config.bossheight)
 			end
@@ -539,16 +549,16 @@ unitframes.specific = {
 
 			self.Auras:SetSize(config.bossdebuffsize*4, config.bossdebuffsize*2)
 			self.Auras.size = config.bossdebuffsize
-		end)
-		
+		end
 
+		local main = self
+		bdCore:hookEvent("unitframesUpdate", function() main:callback() end)
+		
 		self.AuraBars:Hide()
 		
 		self.Name:SetPoint('BOTTOMLEFT', self.Power, "TOPLEFT", 4, 2)
 		self.Curhp:SetPoint('BOTTOMRIGHT', self.Power, "TOPRIGHT", -4, 2)
 		self.CombatIndicator:Hide()
-		
-		
 
 		-- Auras
 		self.Auras = CreateFrame("Frame", nil, self)
