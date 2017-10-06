@@ -357,6 +357,7 @@ unitframes.specific = {
 		-- repositioning
 		local ExtraResource = self.ExtraResource
 		self.ClassPower.PostUpdate = function(self, cur, max, hasMaxChanged, powerType)
+			if not max then return end
 			local width = ((ExtraResource:GetWidth()-(bordersize*max)) +2) / max
 			local element = self
 			local lastPower = nil
@@ -524,7 +525,7 @@ unitframes.specific = {
 		end
 
 		-- Auras
-		self.Auras = CreateFrame("Frame", nil, self)
+	--[[	self.Auras = CreateFrame("Frame", nil, self)
 		self.Auras:SetSize(72, 40)
 		self.Auras.size = 18
 		self.Auras:EnableMouse(false)
@@ -547,13 +548,7 @@ unitframes.specific = {
 		self.Auras.CustomFilter = function(self, icons, unit, name, rank, texture, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, _, nameplateShowAll)
 			local allow = false;
 			-- allow it if it's tracked in the ui and not blacklisted
-			--[[if (bdCore:filterAura(name,caster,true) == true) then
-				allow = true
-			end--]]
-			-- also allow anything that might be casted by the boss
-			--[[if (caster and not strfind(caster, "raid") and not strfind(caster, "party")) then
-				allow = true
-			end--]]
+
 			
 			if (caster and caster == "player") then
 				allow = true
@@ -563,7 +558,7 @@ unitframes.specific = {
 				allow = false
 			end
 			return allow	
-		end
+		end--]]
 		
 		-- castbar
 		self.Castbar:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT", 0, -bordersize)
