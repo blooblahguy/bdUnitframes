@@ -269,7 +269,7 @@ bossanchor:SetSize(200, 50)
 local bordersize = bdCore.config.persistent.General.border
 
 unitframes.specific = {
-	player = function(self,first)
+	player = function(self)
 
 		if (not InCombatLockdown()) then
 			self:SetSize(config.playertargetwidth, config.playertargetheight)
@@ -343,32 +343,33 @@ unitframes.specific = {
 		self.Castbar.Text:SetJustifyH("RIGHT")
 
 		-- class powers
-		local powers = {}
-		for index = 1, 10 do
-			local bar = CreateFrame('StatusBar', nil, self)
-			bar:SetStatusBarTexture(bdCore.media.flat)
-			bar:SetBackdrop({bgFile = bdCore.media.flat, edgeFile = bdCore.media.flat, edgeSize = 2})
-			bar:SetBackdropColor(unpack(bdCore.media.backdrop))
-			bar:SetBackdropBorderColor(unpack(bdCore.media.border))
-			powers[index] = bar
+		if (not self.ClassPower) then
+			local powers = {}
+			for index = 1, 10 do
+				local bar = CreateFrame('StatusBar', nil, self)
+				bar:SetStatusBarTexture(bdCore.media.flat)
+				bdCore:setBackdrop(bar)
+				powers[index] = bar
+			end
+			self.ClassPower = powers
 		end
-		self.ClassPower = powers
 
 		-- repositioning
 		local ExtraResource = self.ExtraResource
 		self.ClassPower.PostUpdate = function(self, cur, max, hasMaxChanged, powerType)
-			local width = (ExtraResource:GetWidth()+bordersize)/max
+			local width = ((ExtraResource:GetWidth()-(bordersize*max)) +2) / max
 			local element = self
 			local lastPower = nil
+
 
 			for i = 1, max do
 				element[i]:SetSize(width, 8)
 				if (lastPower) then
-					bar:SetPoint("LEFT",  lastPower, "RIGHT", -bordersize, 0)
+					element[i]:SetPoint("LEFT",  lastPower, "RIGHT", bordersize, 0)
 				else
-					bar:SetPoint("LEFT", ExtraResource, "LEFT", -bordersize, 0)
+					element[i]:SetPoint("LEFT", ExtraResource, "LEFT", 0, 0)
 				end
-				lastPower = bar
+				lastPower = element[i]
 			end
 		end
 
@@ -614,7 +615,7 @@ local function updateConfig()
 		local func = unit
 		if (string.find(func, "boss")) then func = "boss" end
 
-		unitframes.specific[func](frame, false)
+		unitframes.specific[func](frame)
 	end
 end
 
@@ -654,11 +655,11 @@ function unitframes.Layout(self,unit)
 	bdCore:setBackdrop(self.Power)
 	
 	-- Special Power Display (holy power, etc)
-	self.ExtraResource = CreateFrame("Frame", nil, self)
+	self.ExtraResource = CreateFrame("frame", nil, self)
 	self.ExtraResource:SetPoint("BOTTOMLEFT", self.Power, "TOPLEFT", 0, 2)
-	self.ExtraResource:SetPoint("TOPRIGHT", self.Power, 0, 6)
-	self.ExtraResource:SetPoint("CENTER", UIParent)
-	self.ExtraResource:SetHeight(200,8)
+	self.ExtraResource:SetPoint("BOTTOMRIGHT", self.Power, "TOPRIGHT", 0, 2)
+	self.ExtraResource:SetHeight(8)
+	--self.ExtraResource:SetPoint("CENTER", UIParent)
 	--bdCore:setBackdrop(self.ExtraResource)
 	--[[self.ExtraResource:RegisterEvent("NAME_PLATE_CREATED")
 	self.ExtraResource:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
@@ -865,6 +866,11 @@ function unitframes.Layout(self,unit)
 	end
 
 	bdframes[unit] = self
+
+	local func = unit
+	if (string.find(func, "boss")) then func = "boss" end
+	local main = self
+	unitframes.specific[func](main)
 end
 
 bdCore:hookEvent("unitframesUpdate", function(self)
