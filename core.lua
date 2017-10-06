@@ -263,6 +263,9 @@ local function gradient(perc)
 end
 
 local bdframes = {}
+local bossanchor = CreateFrame("frame", "bdUF Boss Frame Anchor", UIParent)
+bossanchor:SetPoint("LEFT", UIParent, "LEFT", 20, 80)
+bossanchor:SetSize(200, 50)
 local bordersize = bdCore.config.persistent.General.border
 
 unitframes.specific = {
@@ -356,9 +359,9 @@ unitframes.specific = {
 		self.ClassPower.PostUpdate = function(self, cur, max, hasMaxChanged, powerType)
 			local width = (ExtraResource:GetWidth()+bordersize)/max
 			local element = self
-			local lastPower nil
+			local lastPower = nil
 
-			for i = max do
+			for i = 1, max do
 				element[i]:SetSize(width, 8)
 				if (lastPower) then
 					bar:SetPoint("LEFT",  lastPower, "RIGHT", -bordersize, 0)
@@ -588,7 +591,7 @@ local function updateConfig()
 		end
 
 		-- range
-		self.Range = {
+		frame.Range = {
 			insideAlpha = config.inrangealpha,
 			outsideAlpha = config.outofrangealpha,
 		}
@@ -886,13 +889,13 @@ oUF:Factory(function(self)
 	-- targetoftarget
 	local targettarget = self:Spawn("targettarget")
 	targettarget:SetPoint("LEFT", UIParent, "CENTER", (config.playertargetwidth/2+2), -220-config.playertargetheight-config.castbarheight-20)
-	bdCore:makeMovable(tot)
+	bdCore:makeMovable(targettarget)
 
 	-- pet
 	local pet = self:Spawn("pet")
-	loc pet:SetPoint("LEFT", UIParent, "CENTER", -(config.playertargetwidth/2+2), -220-config.playertargetheight-config.castbarheight-20)
+	pet:SetPoint("LEFT", UIParent, "CENTER", -(config.playertargetwidth/2+2), -220-config.playertargetheight-config.castbarheight-20)
 	pet:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", 0, -config.castbarheight-2)
-	bdCore:makeMovable(frames.pet)
+	bdCore:makeMovable(pet)
 
 	-- focus
 	local focus = self:Spawn("focus")
@@ -900,9 +903,6 @@ oUF:Factory(function(self)
 	bdCore:makeMovable(focus)
 	
 	-- boss
-	local bossanchor = CreateFrame("frame", "bdUF Boss Frame Anchor", UIParent)
-	bossanchor:SetPoint("LEFT", UIParent, "LEFT", 20, 80)
-	bossanchor:SetSize(200, 50)
 	bdCore:makeMovable(bossanchor)
 	local boss = {}
 	for i = 1, 5 do
