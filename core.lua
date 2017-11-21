@@ -208,7 +208,7 @@ defaults[#defaults+1] = {bosswidth = {
 }}
 defaults[#defaults+1] = {bossdebuffsize = {
 	type = "slider",
-	value = 120,
+	value = 18,
 	label = "Debuff Size",
 	step = 2,
 	min = 10,
@@ -263,7 +263,7 @@ local function gradient(perc)
 end
 
 local bdframes = {}
-local bossanchor = CreateFrame("frame", UIParent, "bdUF Boss Frame Anchor")
+local bossanchor = CreateFrame("frame", "bdUF Boss Frame Anchor", UIParent)
 bossanchor:SetPoint("LEFT", UIParent, "LEFT", 20, 80)
 bossanchor:SetSize(200, 50)
 local bordersize = bdCore.config.persistent.General.border
@@ -424,10 +424,12 @@ unitframes.specific = {
 		-- buffs
 		self.Buffs:ClearAllPoints()
 		self.Buffs:SetPoint("BOTTOMLEFT", self.Power, "TOPRIGHT", 8, bordersize+2)
+		self.Buffs:SetWidth(82)
 		self.Buffs.CustomFilter = function(icons, unit, name, rank, texture, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, _, nameplateShowAll)
 			local allow = false;
+
 			-- allow it if it's tracked in the ui and not blacklisted
-			if (bdCore:filterAura(name,caster,true) == true) then
+			if ( bdCore:filterAura(name,caster,true) ) then
 				allow = true
 			end
 			-- also allow anything that might be casted by the boss
@@ -439,6 +441,10 @@ unitframes.specific = {
 			end
 			if (caster and not strfind(caster, "raid") and not strfind(caster, "party") and not caster == "player") then
 				allow = true
+			end
+
+			if (bdCore:isBlacklisted(name,caster)) then
+				allow = false
 			end
 			
 			return allow	
@@ -467,6 +473,9 @@ unitframes.specific = {
 			if (not InCombatLockdown()) then
 				self:SetSize(config.targetoftargetwidth, config.targetoftargetheight)
 			end
+
+			self.Buffs:Hide()
+			self.Debuffs:Hide()
 		end
 		local main = self
 		bdCore:hookEvent("unitframesUpdate", function() main:callback() end)
@@ -497,6 +506,9 @@ unitframes.specific = {
 
 			self.Castbar:SetSize(config.focuscastwidth, config.focuscastheight)
 			self.Castbar.Icon:SetSize(config.focuscasticon, config.focuscasticon)
+
+			self.Buffs:Hide()
+			self.Debuffs:Hide()
 		end
 		local main = self
 		bdCore:hookEvent("unitframesUpdate", function() main:callback() end)
@@ -522,6 +534,8 @@ unitframes.specific = {
 			if (not InCombatLockdown()) then
 				self:SetSize(config.targetoftargetwidth, config.targetoftargetheight)
 			end
+			self.Buffs:Hide()
+			self.Debuffs:Hide()
 		end
 		local main = self
 		bdCore:hookEvent("unitframesUpdate", function() main:callback() end)
@@ -553,6 +567,9 @@ unitframes.specific = {
 			self.Castbar:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, -config.castbarheight)
 			self.Castbar.Icon:SetSize(config.castbarheight-bordersize, config.castbarheight-bordersize)
 
+			self.Buffs:Hide()
+			self.Debuffs:Hide()
+
 			self.Auras:SetSize(config.bossdebuffsize*4, config.bossdebuffsize*2)
 			self.Auras.size = config.bossdebuffsize
 		end
@@ -562,7 +579,7 @@ unitframes.specific = {
 		
 		self.AuraBars:Hide()
 		
-		self.Name:SetPoint('BOTTOMLEFT', self.Power, "TOPLEFT", 4, 2)
+		self.Name:SetPoint('LEFT', self, "LEFT", 4, 0)
 		self.Curhp:SetPoint('BOTTOMRIGHT', self.Power, "TOPRIGHT", -4, 2)
 		self.CombatIndicator:Hide()
 
@@ -571,18 +588,20 @@ unitframes.specific = {
 		self.Auras:SetSize(72, 40)
 		self.Auras.size = 18
 		self.Auras:EnableMouse(false)
-		self.Auras.initialAnchor  = "BOTTOMRIGHT"
+		self.Auras.initialAnchor  = "BOTTOMLEFT"
 		self.Auras.spacing = 2
 		self.Auras.num = 20
 		self.Auras['growth-y'] = "UP"
-		self.Auras['growth-x'] = "LEFT"
+		self.Auras['growth-x'] = "RIGHT"
 		self.Auras.PostCreateIcon = function(Debuffs, button)
 			bdCore:setBackdrop(button)
 			button.cd:GetRegions():SetAlpha(0)
 			button.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
 			button:SetAlpha(0.8)
 		end
-		self.Auras:SetPoint("RIGHT", self, "LEFT", -10, 0)
+		self.Auras:ClearAllPoints()
+		self.Auras:SetPoint("BOTTOMLEFT", self.Power, "TOPLEFT", 2, 4)
+		self.Auras:SetPoint("BOTTOMRIGHT", self.Power, "TOPRIGHT", 2, 4)
 
 		self.Auras:Show()
 		
@@ -590,13 +609,14 @@ unitframes.specific = {
 			local allow = false;
 			-- allow it if it's tracked in the ui and not blacklisted
 			
-			if (caster and caster == "player") then
+			if (not caster or UnitIsUnit(caster, "player") or (not UnitIsPlayer(caster))) then
 				allow = true
 			end
 			
-			if (bdCore:isBlacklisted(name)) then
-				allow = false
+			if (bdCore:filterAura(name, caster)) then
+				allow = true
 			end
+
 			return allow	
 		end
 		
@@ -604,7 +624,8 @@ unitframes.specific = {
 		self.Castbar:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT", 0, -bordersize)
 		self.Castbar.Icon:SetPoint("TOPLEFT", self.Castbar,"TOPRIGHT", bordersize, 0)
 		
-		self.Castbar.Text:SetPoint("BOTTOMLEFT", self.Castbar, "TOPLEFT", 2, 6)
+		self.Castbar:ClearAllPoints()
+		self.Castbar.Text:SetPoint("LEFT", self.Castbar, "LEFT", 2, 0)
 		self.Castbar.Text:SetJustifyH("LEFT")	
 		self.Castbar.Time:SetPoint("BOTTOMRIGHT", self.Castbar, "TOPRIGHT", -2, 6)
 		self.Castbar.Time:SetJustifyH("RIGHT")	
@@ -631,18 +652,20 @@ local function updateConfig()
 		}
 		
 		-- buffs/aurabars
-		if (config.bufftrackerstyle == "Icons") then
-			frame.AuraBars:Hide()
-			frame.Buffs:Show()
-			frame.Debuffs:Show()
-		elseif (config.bufftrackerstyle == "Aurabars") then
-			frame.AuraBars:Show()
-			frame.Buffs:Hide()
-			frame.Debuffs:Hide()
-		else
-			frame.AuraBars:Hide()
-			frame.Buffs:Hide()
-			frame.Debuffs:Hide()
+		if (unit == "player" or unit == "target") then
+			if (config.bufftrackerstyle == "Icons") then
+				frame.AuraBars:Hide()
+				frame.Buffs:Show()
+				frame.Debuffs:Show()
+			elseif (config.bufftrackerstyle == "Aurabars") then
+				frame.AuraBars:Show()
+				frame.Buffs:Hide()
+				frame.Debuffs:Hide()
+			else
+				frame.AuraBars:Hide()
+				frame.Buffs:Hide()
+				frame.Debuffs:Hide()
+			end
 		end
 	end
 end
@@ -944,7 +967,7 @@ oUF:Factory(function(self)
 		if (i == 1) then
 			boss[i]:SetPoint("TOP", bossanchor, "TOP", 0, 0)
 		else
-			boss[i]:SetPoint("TOP", boss[i-1], "BOTTOM", 0, -35)
+			boss[i]:SetPoint("TOP", boss[i-1], "BOTTOM", 0, -60)
 		end
 		boss[i]:SetSize(config.bosswidth, config.bossheight)
 	end
