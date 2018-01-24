@@ -556,8 +556,9 @@ unitframes.specific = {
 				self:SetSize(config.bosswidth, config.bossheight)
 
 				-- boss frame
-				bossanchor:Show()
-				if (not config.bossenable) then
+				if (config.bossenable) then
+					bossanchor:Show()
+				elseif (config.bossenable) then
 					bossanchor:Hide()
 				end
 			end
@@ -961,15 +962,16 @@ oUF:Factory(function(self)
 	
 	-- boss
 	bdCore:makeMovable(bossanchor)
-	local boss = {}
+	bossanchor.boss = {}
 	for i = 1, 5 do
-		boss[i] = oUF:Spawn("boss"..i, nil)
+		bossanchor.boss[i] = oUF:Spawn("boss"..i, nil)
+		bossanchor.boss[i]:SetParent(bossanchor)
 		if (i == 1) then
-			boss[i]:SetPoint("TOP", bossanchor, "TOP", 0, 0)
+			bossanchor.boss[i]:SetPoint("TOP", bossanchor, "TOP", 0, 0)
 		else
-			boss[i]:SetPoint("TOP", boss[i-1], "BOTTOM", 0, -60)
+			bossanchor.boss[i]:SetPoint("TOP", bossanchor.boss[i-1], "BOTTOM", 0, -60)
 		end
-		boss[i]:SetSize(config.bosswidth, config.bossheight)
+		bossanchor.boss[i]:SetSize(config.bosswidth, config.bossheight)
 	end
 
 	-- trigger config
