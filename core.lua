@@ -558,8 +558,14 @@ unitframes.specific = {
 				-- boss frame
 				if (config.bossenable) then
 					bossanchor:Show()
+					for k, frame in pairs(bossanchor.boss) do
+						frame:Show()
+					end
 				elseif (config.bossenable) then
 					bossanchor:Hide()
+					for k, frame in pairs(bossanchor.boss) do
+						frame:Hide()
+					end
 				end
 			end
 
