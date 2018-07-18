@@ -336,7 +336,7 @@ unitframes.specific = {
 		self.Buffs.num = 20
 		self.Buffs['growth-y'] = "UP"
 		self.Buffs['growth-x'] = "RIGHT"
-		self.Buffs.CustomFilter = function(icons, unit, something, name, rank, texture, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, _, nameplateShowAll)
+		self.Buffs.CustomFilter = function(element, unit, button, name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll,timeMod, effect1, effect2, effect3)
 
 			if (bdCore:filterAura(name,caster,true)) then
 				if (caster == "player" and duration ~= 0 and duration < 300) then
@@ -425,7 +425,7 @@ unitframes.specific = {
 		self.Buffs:ClearAllPoints()
 		self.Buffs:SetPoint("BOTTOMLEFT", self.Power, "TOPRIGHT", 8, bordersize+2)
 		self.Buffs:SetWidth(82)
-		self.Buffs.CustomFilter = function(icons, unit, name, rank, texture, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, _, nameplateShowAll)
+		self.Buffs.CustomFilter = function(element, unit, button, name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll,timeMod, effect1, effect2, effect3)
 			local allow = false;
 
 			-- allow it if it's tracked in the ui and not blacklisted
@@ -451,7 +451,7 @@ unitframes.specific = {
 		end
 		
 		-- debuffs
-		self.Debuffs.CustomFilter = function(icons, unit, something, name, rank, texture, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, _, nameplateShowAll)
+		self.Debuffs.CustomFilter = function(element, unit, button, name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll, timeMod, effect1, effect2, effect3)
 			if (bdCore:filterAura(name,caster,true)) then
 				if (caster and UnitIsUnit(caster,"player") and duration ~= 0 and duration < 300) then
 					return true 
@@ -612,7 +612,7 @@ unitframes.specific = {
 
 		self.Auras:Show()
 		
-		self.Auras.CustomFilter = function(self, icons, unit, name, rank, texture, count, dispelType, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, _, nameplateShowAll)
+		self.Auras.CustomFilter = function(element, unit, button, name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll,timeMod, effect1, effect2, effect3)
 			local allow = false;
 			-- allow it if it's tracked in the ui and not blacklisted
 			
@@ -911,7 +911,7 @@ function unitframes.Layout(self,unit)
 	self.Castbar.Time:SetFont(bdCore.media.font, 12, "OUTLINE")
 	self.Castbar.Time:SetJustifyH("CENTER")
 	self.Castbar.Time:SetPoint("CENTER", self.Castbar.Icon)
-	self.Castbar.PostCastStart = function(self,unit, name, castid)
+	self.Castbar.PostCastStart = function(self, unit, name, castid)
 		if (unit == "player") then return end
 		local interrupt = select(9, UnitCastingInfo(unit))
 		if (interrupt) then
