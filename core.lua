@@ -451,7 +451,7 @@ unitframes.specific = {
 		end
 		
 		-- debuffs
-		self.Debuffs.CustomFilter = function(element, unit, button, name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll, timeMod, effect1, effect2, effect3)
+		self.Debuffs.CustomFilter = function(element, unit, button, name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll,timeMod, effect1, effect2, effect3)
 			if (bdCore:filterAura(name,caster,true)) then
 				if (caster and UnitIsUnit(caster,"player") and duration ~= 0 and duration < 300) then
 					return true 
