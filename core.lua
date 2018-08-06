@@ -818,7 +818,7 @@ function unitframes.Layout(self,unit)
 		bar.bg:Hide()
 	end
 	
-	self.AuraBars.filter = function(name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable)
+	self.AuraBars.filter = function(name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable)
 		if (bdCore:filterAura(name,unitCaster,true) and config.bufftrackerstyle == "Aurabars") then
 			if (unitCaster == "player" and duration ~= 0 and duration < 300) then
 				return true 
