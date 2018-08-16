@@ -6,4 +6,8 @@
 ## X-oUF: oUFbdUnitframes
 ## Dependencies: bdCore
 
+init.lua
+functions.lua
 core.lua
+bosses.lua
+arena.lua

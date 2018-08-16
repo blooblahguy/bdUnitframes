@@ -338,7 +338,7 @@ unitframes.specific = {
 		self.Buffs['growth-x'] = "RIGHT"
 		self.Buffs.CustomFilter = function(element, unit, button, name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll,timeMod, effect1, effect2, effect3)
 
-			if (bdCore:filterAura(name,caster,true)) then
+			if (bdCore:filterAura(name, caster,true)) then
 				if (caster == "player" and duration ~= 0 and duration < 300) then
 					return true 
 				end
