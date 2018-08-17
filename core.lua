@@ -338,7 +338,7 @@ unitframes.specific = {
 		self.Buffs['growth-x'] = "RIGHT"
 		self.Buffs.CustomFilter = function(element, unit, button, name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll,timeMod, effect1, effect2, effect3)
 
-			if (bdCore:filterAura(name, caster,true)) then
+			if (bdCore:filterAura(name, caster, isBossDebuff, nameplateShowAll, true)) then
 				if (caster == "player" and duration ~= 0 and duration < 300) then
 					return true 
 				end
@@ -429,7 +429,7 @@ unitframes.specific = {
 			local allow = false;
 
 			-- allow it if it's tracked in the ui and not blacklisted
-			if ( bdCore:filterAura(name,caster,true) ) then
+			if ( bdCore:filterAura(name, caster, isBossDebuff, nameplateShowAll, true) ) then
 				allow = true
 			end
 			-- also allow anything that might be casted by the boss
@@ -452,7 +452,7 @@ unitframes.specific = {
 		
 		-- debuffs
 		self.Debuffs.CustomFilter = function(element, unit, button, name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll,timeMod, effect1, effect2, effect3)
-			if (bdCore:filterAura(name,caster,true)) then
+			if (bdCore:filterAura(name, caster, isBossDebuff, nameplateShowAll, true)) then
 				if (caster and UnitIsUnit(caster,"player") and duration ~= 0 and duration < 300) then
 					return true 
 				end
@@ -620,7 +620,7 @@ unitframes.specific = {
 				allow = true
 			end
 			
-			if (bdCore:filterAura(name, caster)) then
+			if (bdCore:filterAura(name, caster, isBossDebuff, nameplateShowAll, false)) then
 				allow = true
 			end
 
@@ -818,8 +818,8 @@ function unitframes.Layout(self,unit)
 		bar.bg:Hide()
 	end
 	
-	self.AuraBars.filter = function(name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable)
-		if (bdCore:filterAura(name,unitCaster,true) and config.bufftrackerstyle == "Aurabars") then
+	self.AuraBars.filter = function(name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll, timeMod, effect1, effect2, effect3)
+		if (bdCore:filterAura(name, unitCaster, isBossDebuff, nameplateShowAll, true) and config.bufftrackerstyle == "Aurabars") then
 			if (unitCaster == "player" and duration ~= 0 and duration < 300) then
 				return true 
 			end
@@ -913,8 +913,8 @@ function unitframes.Layout(self,unit)
 	self.Castbar.Time:SetPoint("CENTER", self.Castbar.Icon)
 	self.Castbar.PostCastStart = function(self, unit, name, castid)
 		if (unit == "player") then return end
-		local interrupt = select(9, UnitCastingInfo(unit))
-		if (interrupt) then
+		local notInterruptible = select(8, UnitCastingInfo(unit))
+		if (notInterruptible) then
 			self.Icon:SetDesaturated(1)
 			self:SetStatusBarColor(.7, .7, .7, 1)
 		else
