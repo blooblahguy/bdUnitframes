@@ -328,7 +328,7 @@ unitframes.specific = {
 		bdCore:hookEvent("unitframesUpdate", function() main:callback() end)
 
 		-- config buffs
-		self.Buffs:SetPoint("BOTTOMLEFT", self.Power, "TOPLEFT", 0, 2)
+		self.Buffs:SetPoint("BOTTOMLEFT", self.Power, "TOPLEFT", 0, 12)
 		self.Buffs.size = 28
 		self.Buffs:EnableMouse(false)
 		self.Buffs.initialAnchor  = "BOTTOMLEFT"
@@ -794,8 +794,8 @@ function unitframes.Layout(self,unit)
 	-- Auras
 	self.AuraBars = self.AuraBars or CreateFrame("Frame", nil, self)
 	self.AuraBars:SetHeight(2)
-	self.AuraBars:SetPoint("BOTTOMLEFT", self.Power, "TOPLEFT", 0, 10)
-	self.AuraBars:SetPoint("BOTTOMRIGHT", self.Power, "TOPRIGHT", 0, 10)
+	self.AuraBars:SetPoint("BOTTOMLEFT", self.Power, "TOPLEFT", 0, 12)
+	self.AuraBars:SetPoint("BOTTOMRIGHT", self.Power, "TOPRIGHT", 0, 12)
 	
 	-- Options
 	self.AuraBars.auraBarTexture = bdCore.media.flat
