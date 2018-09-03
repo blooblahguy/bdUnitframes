@@ -8,6 +8,6 @@
 
 init.lua
 functions.lua
-core.lua
 bosses.lua
 arena.lua
+core.lua

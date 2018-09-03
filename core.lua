@@ -1,4 +1,5 @@
 local oUF = bdCore.oUF
+local addon, bdUnitframes = ...
 
 local unitframes = CreateFrame("frame",nil,UIParent)
 local defaults = {}
