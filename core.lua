@@ -678,6 +678,16 @@ local function updateConfig()
 	end
 end
 
+local function kickable(self)
+	if (self.notInterruptible) then
+		self.Icon:SetDesaturated(1)
+		self:SetStatusBarColor(0.7, 0.7, 0.7, 1)
+	else
+		self.Icon:SetDesaturated(false)
+		self:SetStatusBarColor(.1, .4, .7, 1)
+	end
+end
+
 oUF.colors.power['MANA'] = {46/255, 130/255, 215/255}
 function unitframes.Layout(self,unit)
 	bordersize = bdCore.config.persistent.General.border
@@ -912,17 +922,13 @@ function unitframes.Layout(self,unit)
 	self.Castbar.Time:SetFont(bdCore.media.font, 12, "OUTLINE")
 	self.Castbar.Time:SetJustifyH("CENTER")
 	self.Castbar.Time:SetPoint("CENTER", self.Castbar.Icon)
-	self.Castbar.PostCastStart = function(self, unit, name, castid)
-		if (unit == "player") then return end
-		local notInterruptible = select(8, UnitCastingInfo(unit))
-		if (notInterruptible) then
-			self.Icon:SetDesaturated(1)
-			self:SetStatusBarColor(.7, .7, .7, 1)
-		else
-			self.Icon:SetDesaturated(false)
-			self:SetStatusBarColor(.1, .4, .7, 1)
-		end
-	end
+
+	self.Castbar.PostChannelStart = kickable
+	self.Castbar.PostChannelUpdate = kickable
+	self.Castbar.PostCastStart = kickable
+	self.Castbar.PostCastDelayed = kickable
+	self.Castbar.PostCastNotInterruptible = kickable
+	self.Castbar.PostCastInterruptible = kickable
 
 	bdframes[unit] = self
 
