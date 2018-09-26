@@ -990,3 +990,11 @@ oUF:Factory(function(self)
 	-- trigger config
 	bdCore:triggerEvent("unitframesUpdate")
 end)
+
+local addonDisabler = CreateFrame("frame", nil)
+addonDisabler:RegisterEvent("ADDON_LOADED")
+addonDisabler:SetScript("OnEvent", function(self, event, addon)
+	if (IsAddOnLoaded("Blizzard_UnitFrame")) then
+		DisableAddOn("Blizzard_UnitFrame")
+	end
+end)
