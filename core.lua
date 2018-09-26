@@ -444,7 +444,7 @@ unitframes.specific = {
 				allow = true
 			end
 
-			if (bdCore:isBlacklisted(name,caster)) then
+			if (bdCore:isBlacklisted(name)) then
 				allow = false
 			end
 			
