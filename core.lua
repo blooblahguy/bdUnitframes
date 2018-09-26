@@ -997,4 +997,7 @@ addonDisabler:SetScript("OnEvent", function(self, event, addon)
 	if (IsAddOnLoaded("Blizzard_UnitFrame")) then
 		DisableAddOn("Blizzard_UnitFrame")
 	end
+	if (IsAddOnLoaded("Blizzard_UnitFrames")) then
+		DisableAddOn("Blizzard_UnitFrames")
+	end
 end)
