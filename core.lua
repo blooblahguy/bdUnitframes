@@ -341,7 +341,7 @@ unitframes.specific = {
 			isBossDebuff = isBossDebuff or false
 			nameplateShowAll = nameplateShowAll or false
 			local castByPlayer = caster and UnitIsUnit(caster, "player") or false
-			if (bdCore:filterAura(name, caster, isBossDebuff, nameplateShowAll, true)) then
+			if (bdCore:filterAura(name, castByPlayer, isBossDebuff, nameplateShowAll, true)) then
 				if (caster == "player" and duration ~= 0 and duration < 300) then
 					return true 
 				end
@@ -436,7 +436,7 @@ unitframes.specific = {
 			local allow = false;
 
 			-- allow it if it's tracked in the ui and not blacklisted
-			if ( bdCore:filterAura(name, caster, isBossDebuff, nameplateShowAll, true) ) then
+			if ( bdCore:filterAura(name, castByPlayer, isBossDebuff, nameplateShowAll, true) ) then
 				allow = true
 			end
 			-- also allow anything that might be casted by the boss
@@ -462,7 +462,7 @@ unitframes.specific = {
 			isBossDebuff = isBossDebuff or false
 			nameplateShowAll = nameplateShowAll or false
 			local castByPlayer = caster and UnitIsUnit(caster, "player") or false
-			if (bdCore:filterAura(name, caster, isBossDebuff, nameplateShowAll, true)) then
+			if (bdCore:filterAura(name, castByPlayer, isBossDebuff, nameplateShowAll, true)) then
 				if (caster and UnitIsUnit(caster,"player") and duration ~= 0 and duration < 300) then
 					return true 
 				end
@@ -633,7 +633,7 @@ unitframes.specific = {
 				allow = true
 			end
 			
-			if (bdCore:filterAura(name, caster, isBossDebuff, nameplateShowAll, false)) then
+			if (bdCore:filterAura(name, castByPlayer, isBossDebuff, nameplateShowAll, false)) then
 				allow = true
 			end
 
@@ -845,7 +845,7 @@ function unitframes.Layout(self,unit)
 		isBossDebuff = isBossDebuff or false
 		nameplateShowAll = nameplateShowAll or false
 		local castByPlayer = caster and UnitIsUnit(caster, "player") or false
-		if (bdCore:filterAura(name, caster, isBossDebuff, nameplateShowAll, false) and config.bufftrackerstyle == "Aurabars") then
+		if (bdCore:filterAura(name, castByPlayer, isBossDebuff, nameplateShowAll, false) and config.bufftrackerstyle == "Aurabars") then
 			if (unitCaster == "player" and duration ~= 0 and duration < 300) then
 				return true 
 			end
