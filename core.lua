@@ -337,7 +337,7 @@ unitframes.specific = {
 		self.Buffs.num = 20
 		self.Buffs['growth-y'] = "UP"
 		self.Buffs['growth-x'] = "RIGHT"
-		self.Buffs.CustomFilter = function(element, unit, button, name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll,timeMod, effect1, effect2, effect3)
+		self.Buffs.CustomFilter = function(element, unit, button, name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll, timeMod, effect1, effect2, effect3)
 			isBossDebuff = isBossDebuff or false
 			nameplateShowAll = nameplateShowAll or false
 			local castByPlayer = caster and UnitIsUnit(caster, "player") or false
@@ -428,7 +428,7 @@ unitframes.specific = {
 		self.Buffs:ClearAllPoints()
 		self.Buffs:SetPoint("BOTTOMLEFT", self.Power, "TOPRIGHT", 8, bordersize+2)
 		self.Buffs:SetWidth(82)
-		self.Buffs.CustomFilter = function(element, unit, button, name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll,timeMod, effect1, effect2, effect3)
+		self.Buffs.CustomFilter = function(element, unit, button, name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll, timeMod, effect1, effect2, effect3)
 			isBossDebuff = isBossDebuff or false
 			nameplateShowAll = nameplateShowAll or false
 			local castByPlayer = caster and UnitIsUnit(caster, "player") or false
@@ -458,7 +458,7 @@ unitframes.specific = {
 		end
 		
 		-- debuffs
-		self.Debuffs.CustomFilter = function(element, unit, button, name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll,timeMod, effect1, effect2, effect3)
+		self.Debuffs.CustomFilter = function(element, unit, button, name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll, timeMod, effect1, effect2, effect3)
 			isBossDebuff = isBossDebuff or false
 			nameplateShowAll = nameplateShowAll or false
 			local castByPlayer = caster and UnitIsUnit(caster, "player") or false
@@ -622,7 +622,7 @@ unitframes.specific = {
 
 		self.Auras:Show()
 		
-		self.Auras.CustomFilter = function(element, unit, button, name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll,timeMod, effect1, effect2, effect3)
+		self.Auras.CustomFilter = function(element, unit, button, name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll, timeMod, effect1, effect2, effect3)
 			isBossDebuff = isBossDebuff or false
 			nameplateShowAll = nameplateShowAll or false
 			local castByPlayer = caster and UnitIsUnit(caster, "player") or false
@@ -841,11 +841,11 @@ function unitframes.Layout(self,unit)
 		bar.bg:Hide()
 	end
 	
-	self.AuraBars.filter = function(name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll, timeMod, effect1, effect2, effect3)
+	self.AuraBars.filter = function(element, unit, button, name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll, timeMod, effect1, effect2, effect3)
 		isBossDebuff = isBossDebuff or false
 		nameplateShowAll = nameplateShowAll or false
 		local castByPlayer = caster and UnitIsUnit(caster, "player") or false
-		if (bdCore:filterAura(name, unitCaster, isBossDebuff, nameplateShowAll, true) and config.bufftrackerstyle == "Aurabars") then
+		if (bdCore:filterAura(name, caster, isBossDebuff, nameplateShowAll, false) and config.bufftrackerstyle == "Aurabars") then
 			if (unitCaster == "player" and duration ~= 0 and duration < 300) then
 				return true 
 			end
