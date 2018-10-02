@@ -269,6 +269,8 @@ bossanchor:SetPoint("LEFT", UIParent, "LEFT", 20, 80)
 bossanchor:SetSize(200, 50)
 local bordersize = bdCore.config.persistent.General.border
 
+-- local focuscastbarholder = CreateFrame("frame", UIParent, )
+
 unitframes.specific = {
 	player = function(self)
 		-- update function
@@ -529,8 +531,11 @@ unitframes.specific = {
 		self.AuraBars:Hide()
 		self.CombatIndicator:Hide()
 		self.RestingIndicator:Hide()
+
+		
 		
 		self.Castbar:SetPoint("TOP", UIParent, "TOP", 0, -80)
+		bdCore:makeMovable(self.Castbar, true, "bdUnitframes Focus Castbar")
 		self.Castbar.Time:SetPoint("TOPLEFT", self.Castbar, "BOTTOMLEFT", 2, -4)
 		self.Castbar.Time:SetFont(bdCore.media.font, 14)
 		self.Castbar.Text:SetPoint("TOPRIGHT", self.Castbar, "BOTTOMRIGHT", -2, -4)
