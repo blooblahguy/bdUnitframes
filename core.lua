@@ -235,12 +235,14 @@ defaults[#defaults+1] = {bosspower  = {
 	callback = function() bdCore:triggerEvent("unitframesUpdate") end
 }} 
 
-if (not bdCore.modules["Auras"]) then
-	bdCore:addModule("Auras", bdCore.auraconfig, true)
-end
+-- if (not bdCore.modules["Auras"]) then
+-- 	bdCore:addModule("Auras", bdCore.auraconfig, true)
+-- end
 
-bdCore:addModule("Unit Frames", defaults)
-local config = bdCore.config.profile['Unit Frames']
+bdConfigLib:RegisterModule({
+	name = "Unit Frames"
+}, defaults, BD_persistent)
+local config = bdConfigLib.profile['Unit Frames']
 
 local function numberize(v)
 	if v <= 9999 then return v end
