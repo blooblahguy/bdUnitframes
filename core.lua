@@ -242,7 +242,7 @@ defaults[#defaults+1] = {bosspower  = {
 bdConfigLib:RegisterModule({
 	name = "Unit Frames"
 }, defaults, BD_persistent)
-local config = bdConfigLib.profile['Unit Frames']
+local config = bdConfigLib:GetSave('Unit Frames')
 
 local function numberize(v)
 	if v <= 9999 then return v end
@@ -269,7 +269,7 @@ local bdframes = {}
 local bossanchor = CreateFrame("frame", "bdUF Boss Frame Anchor", UIParent)
 bossanchor:SetPoint("LEFT", UIParent, "LEFT", 20, 80)
 bossanchor:SetSize(200, 50)
-local bordersize = bdCore.config.persistent.General.border
+local bordersize = 2--bdCore.config.persistent.General.border
 
 -- local focuscastbarholder = CreateFrame("frame", UIParent, )
 
@@ -660,7 +660,7 @@ unitframes.specific = {
 }
 
 local function updateConfig()
-	config = bdCore.config.profile['Unit Frames']
+	-- config = bdCore.config.profile['Unit Frames']
 	
 	-- loop through our frames
 	for unit, frame in pairs(bdframes) do
@@ -709,7 +709,7 @@ end
 
 oUF.colors.power['MANA'] = {46/255, 130/255, 215/255}
 function unitframes.Layout(self,unit)
-	bordersize = bdCore.config.persistent.General.border
+	-- bordersize = bdCore.config.persistent.General.border
 
 	self:RegisterForClicks('AnyDown')
 	self:SetScript('OnEnter', UnitFrame_OnEnter)
@@ -731,8 +731,8 @@ function unitframes.Layout(self,unit)
 	self.Power = CreateFrame("StatusBar", nil, self)
 	self.Power:SetStatusBarTexture(bdCore.media.flat)
 	self.Power:ClearAllPoints()
-	self.Power:SetPoint("BOTTOMLEFT", self.Health, "TOPLEFT",0, bdCore.config.persistent.General.border)
-	self.Power:SetPoint("BOTTOMRIGHT", self.Health, "TOPRIGHT",0, bdCore.config.persistent.General.border)
+	self.Power:SetPoint("BOTTOMLEFT", self.Health, "TOPLEFT",0, bordersize)
+	self.Power:SetPoint("BOTTOMRIGHT", self.Health, "TOPRIGHT",0, bordersize)
 	self.Power:SetHeight(config.playertargetpowerheight)
 	self.Power.frequentUpdates = true
 	self.Power.colorTapping = true
@@ -935,8 +935,8 @@ function unitframes.Layout(self,unit)
 	self.Castbar.bg = self.Castbar:CreateTexture(nil, "BORDER")
 	self.Castbar.bg:SetTexture(bdCore.media.flat)
 	self.Castbar.bg:SetVertexColor(unpack(bdCore.media.border))
-	self.Castbar.bg:SetPoint("TOPLEFT", self.Castbar.Icon, "TOPLEFT", -bdCore.config.persistent.General.border, bdCore.config.persistent.General.border)
-	self.Castbar.bg:SetPoint("BOTTOMRIGHT", self.Castbar.Icon, "BOTTOMRIGHT", bdCore.config.persistent.General.border, -bdCore.config.persistent.General.border)
+	self.Castbar.bg:SetPoint("TOPLEFT", self.Castbar.Icon, "TOPLEFT", -bordersize, bordersize)
+	self.Castbar.bg:SetPoint("BOTTOMRIGHT", self.Castbar.Icon, "BOTTOMRIGHT", bordersize, -bordersize)
 	self.Castbar.SafeZone = self.Castbar:CreateTexture(nil, "OVERLAY")
 	self.Castbar.SafeZone:SetVertexColor(0.85,0.10,0.10,0.20)
 	self.Castbar.SafeZone:SetTexture(bdCore.media.flat)
