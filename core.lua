@@ -236,9 +236,9 @@ defaults[#defaults+1] = {bosspower  = {
 }} 
 
 -- aura conditional loading
-local auras_config = bdConfigLib:GetSave('Auras')
+local aura_config = bdConfigLib:GetSave('Auras')
 if (not aura_config) then
-	auras_config = bdConfigLib:RegisterModule({
+	aura_config = bdConfigLib:RegisterModule({
 		name = "Auras"
 	}, bdCore.auraconfig, "BD_persistent")
 end
