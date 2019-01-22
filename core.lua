@@ -243,11 +243,9 @@ if (not aura_config) then
 	}, bdCore.auraconfig, "BD_persistent")
 end
 
-
 local config = bdConfigLib:RegisterModule({
 	name = "Unit Frames"
 }, defaults, "BD_persistent")
-bdConfigLib:GetSave('Unit Frames')
 
 local function numberize(v)
 	if v <= 9999 then return v end
@@ -592,6 +590,7 @@ unitframes.specific = {
 			end
 
 			self.Power:SetHeight(config.bosspower)
+			self.AlternativePower:SetHeight(config.bosspower)
 
 			self.Castbar:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, -config.castbarheight)
 			self.Castbar.Icon:SetSize(config.castbarheight-bordersize, config.castbarheight-bordersize)
@@ -605,6 +604,14 @@ unitframes.specific = {
 
 		local main = self
 		bdCore:hookEvent("unitframesUpdate", function() main:callback() end)
+
+		-- Alternative power for boss frames
+		self.AlternativePower = CreateFrame('StatusBar', nil, self)
+		self.AlternativePower:SetStatusBarTexture(bdCore.media.flat)
+		self.AlternativePower:SetPoint("TOPLEFT", self.Health, "BOTTOMLEFT", 0, -bordersize)
+		self.AlternativePower:SetPoint("TOPRIGHT", self.Health, "BOTTOMRIGHT", 0, -bordersize)
+		self.AlternativePower:SetHeight(config.bosspower)
+		bdCore:setBackdrop(self.AlternativePower)
 		
 		self.AuraBars:Hide()
 		
@@ -752,26 +759,6 @@ function unitframes.Layout(self,unit)
 	self.ExtraResource:SetPoint("BOTTOMLEFT", self.Power, "TOPLEFT", 0, 2)
 	self.ExtraResource:SetPoint("BOTTOMRIGHT", self.Power, "TOPRIGHT", 0, 2)
 	self.ExtraResource:SetHeight(8)
-	--self.ExtraResource:SetPoint("CENTER", UIParent)
-	--bdCore:setBackdrop(self.ExtraResource)
-	--[[self.ExtraResource:RegisterEvent("NAME_PLATE_CREATED")
-	self.ExtraResource:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
-	self.ExtraResource:RegisterEvent("NAME_PLATE_UNIT_ADDED")
-	self.ExtraResource:RegisterEvent("PLAYER_TARGET_CHANGED")
-	self.ExtraResource:SetScript("OnEvent",function()
-		NamePlateTargetResourceFrame:Layout();
-		NamePlateTargetResourceFrame:Show()
-		NamePlateTargetResourceFrame:ClearAllPoints()
-		NamePlateTargetResourceFrame:SetPoint("CENTER", UIParent, "CENTER", 0, -200)
-	end)
-	NamePlateTargetResourceFrame:Layout();
-	NamePlateTargetResourceFrame:Show()
-	NamePlateTargetResourceFrame:ClearAllPoints()
-	NamePlateTargetResourceFrame:SetPoint("CENTER", UIParent, "CENTER", 0, -200)
-	NamePlateTargetResourceFrame.SetPoint = function(self,...) end
-	NamePlateTargetResourceFrame.ClearAllPoints = function(self,...) end
-	NamePlateTargetResourceFrame.Show = function(self,...) end
-	NamePlateTargetResourceFrame.Hide = function(self,...) end--]]
 	
 	-- Combat indicator
 	self.CombatIndicator = self.Health:CreateTexture(nil, "OVERLAY")
