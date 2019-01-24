@@ -19,7 +19,7 @@ defaults[#defaults+1] = {showtargetbuffs = {
 	callback = function() bdCore:triggerEvent("unitframesUpdate") end
 }}
 defaults[#defaults+1] = {inrangealpha = {
-	type = "slide",
+	type = "slider",
 	min = 0.1,
 	max = 1,
 	step = 0.1,
@@ -29,7 +29,7 @@ defaults[#defaults+1] = {inrangealpha = {
 }} 
 
 defaults[#defaults+1] = {outofrangealpha = {
-	type = "slide",
+	type = "slider",
 	min = 0.1,
 	max = 1,
 	step = 0.1,
