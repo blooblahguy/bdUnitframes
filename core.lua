@@ -239,7 +239,8 @@ defaults[#defaults+1] = {bosspower  = {
 local aura_config = bdConfigLib:GetSave('Auras')
 if (not aura_config) then
 	aura_config = bdConfigLib:RegisterModule({
-		name = "Auras"
+		name = "Auras",
+		persistent = true
 	}, bdCore.auraconfig, "BD_persistent")
 end
 
@@ -272,7 +273,7 @@ local bdframes = {}
 local bossanchor = CreateFrame("frame", "bdUF Boss Frame Anchor", UIParent)
 bossanchor:SetPoint("LEFT", UIParent, "LEFT", 20, 80)
 bossanchor:SetSize(200, 50)
-local bordersize = 2--bdCore.config.persistent.General.border
+local bordersize = bdConfigLib:GetSave("bdAddons").border or 2
 
 -- local focuscastbarholder = CreateFrame("frame", UIParent, )
 
@@ -624,6 +625,7 @@ unitframes.specific = {
 		self.Auras:SetSize(72, 40)
 		self.Auras.size = 18
 		self.Auras:EnableMouse(false)
+		self.Auras.disableMouse = true
 		self.Auras.initialAnchor  = "BOTTOMLEFT"
 		self.Auras.spacing = 2
 		self.Auras.num = 20
@@ -781,6 +783,7 @@ function unitframes.Layout(self,unit)
 	self.Buffs:SetSize(140, 40)
 	self.Buffs.size = 18
 	self.Buffs:EnableMouse(false)
+	self.Buffs.disableMouse = true
 	self.Buffs.initialAnchor  = "BOTTOMLEFT"
 	self.Buffs.spacing = 2
 	self.Buffs.num = 20
@@ -798,6 +801,7 @@ function unitframes.Layout(self,unit)
 	self.Debuffs:SetSize(config.playertargetwidth, 60)
 	self.Debuffs.size = 28
 	self.Debuffs:EnableMouse(false)
+	self.Debuffs.disableMouse = true
 	self.Debuffs.initialAnchor  = "BOTTOMRIGHT"
 	self.Debuffs.spacing = 2
 	self.Debuffs.num = 20

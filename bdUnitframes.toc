@@ -11,3 +11,4 @@ functions.lua
 bosses.lua
 arena.lua
 core.lua
+altpower.lua
