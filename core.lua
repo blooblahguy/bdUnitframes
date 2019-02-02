@@ -31,7 +31,7 @@ defaults[#defaults+1] = {inrangealpha = {
 defaults[#defaults+1] = {outofrangealpha = {
 	type = "slider",
 	min = 0.1,
-	max = 1,
+	max = 0.5,
 	step = 0.1,
 	value = 1,
 	label = "Out of Range Alpha",
