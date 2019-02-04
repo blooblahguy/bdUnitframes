@@ -200,17 +200,17 @@ defaults[#defaults+1] = {bossenable = {
 }}
 defaults[#defaults+1] = {bosswidth = {
 	type = "slider",
-	value = 120,
+	value = 200,
 	label = "Width",
-	step = 2,
+	step = 5,
 	min = 60,
-	max = 220,
+	max = 420,
 	callback = function() bdCore:triggerEvent("unitframesUpdate") end
 }}
 defaults[#defaults+1] = {bossdebuffsize = {
 	type = "slider",
-	value = 18,
-	label = "Debuff Size",
+	value = 30,
+	label = "Aura Size",
 	step = 2,
 	min = 10,
 	max = 100,
@@ -218,20 +218,20 @@ defaults[#defaults+1] = {bossdebuffsize = {
 }}
 defaults[#defaults+1] = {bossheight = {
 	type = "slider",
-	value = 16,
+	value = 40,
 	label = "Height",
-	step = 2,
-	min = 6,
-	max = 30,
+	step = 5,
+	min = 5,
+	max = 200,
 	callback = function() bdCore:triggerEvent("unitframesUpdate") end
 }}
 defaults[#defaults+1] = {bosspower  = {
 	type = "slider",
-	value = 4,
+	value = 10,
 	label = "Power height",
 	step = 1,
 	min = 2,
-	max = 10,
+	max = 20,
 	callback = function() bdCore:triggerEvent("unitframesUpdate") end
 }} 
 
@@ -593,7 +593,7 @@ unitframes.specific = {
 			self.Power:SetHeight(config.bosspower)
 			self.AlternativePower:SetHeight(config.bosspower)
 
-			self.Castbar:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, -config.castbarheight)
+			self.Castbar:SetHeight(config.bossheight)
 			self.Castbar.Icon:SetSize(config.castbarheight-bordersize, config.castbarheight-bordersize)
 
 			self.Buffs:Hide()
@@ -620,12 +620,15 @@ unitframes.specific = {
 		self.Curhp:SetPoint('BOTTOMRIGHT', self.Power, "TOPRIGHT", -4, 2)
 		self.CombatIndicator:Hide()
 
+		self.Curhp:ClearAllPoints()
+		self.Curhp:SetPoint('RIGHT', self.Health, "RIGHT", -6, 0)
+		self.Curhp:SetJustifyH("RIGHT")
+
 		-- Auras
 		self.Auras = CreateFrame("Frame", nil, self)
 		self.Auras:SetSize(72, 40)
-		self.Auras.size = 18
-		self.Auras:EnableMouse(false)
-		self.Auras.disableMouse = true
+		self.Auras.size = config.bossdebuffsize
+		self.Auras.disableMouse = false
 		self.Auras.initialAnchor  = "BOTTOMLEFT"
 		self.Auras.spacing = 2
 		self.Auras.num = 20
@@ -638,7 +641,7 @@ unitframes.specific = {
 			button:SetAlpha(0.8)
 		end
 		self.Auras:ClearAllPoints()
-		self.Auras:SetPoint("BOTTOMLEFT", self.Power, "TOPLEFT", 2, 4)
+		self.Auras:SetPoint("BOTTOMLEFT", self.Power, "TOPLEFT", 0, 4)
 		self.Auras:SetPoint("BOTTOMRIGHT", self.Power, "TOPRIGHT", 2, 4)
 
 		self.Auras:Show()
@@ -662,14 +665,14 @@ unitframes.specific = {
 		end
 		
 		-- castbar
+		self.Castbar:ClearAllPoints()
+		
 		self.Castbar:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT", 0, -bordersize)
 		self.Castbar.Icon:SetPoint("TOPLEFT", self.Castbar,"TOPRIGHT", bordersize, 0)
-		
-		self.Castbar:ClearAllPoints()
 		self.Castbar.Text:SetPoint("LEFT", self.Castbar, "LEFT", 2, 0)
 		self.Castbar.Text:SetJustifyH("LEFT")	
 		self.Castbar.Time:SetPoint("BOTTOMRIGHT", self.Castbar, "TOPRIGHT", -2, 6)
-		self.Castbar.Time:SetJustifyH("RIGHT")	
+		self.Castbar.Time:SetJustifyH("RIGHT")
 	end
 }
 
@@ -736,9 +739,33 @@ function unitframes.Layout(self,unit)
 	self.Health.frequentUpdates = true
 	self.Health.colorTapping = true
 	self.Health.colorDisconnected = true
-	self.Health.colorClass = true
-	self.Health.colorReaction = true
-	self.Health.colorHealth = true
+	
+
+	
+
+	self.Health.PreUpdate = function(self, unit)
+		-- print(unit)
+		self.colorSmooth = true
+		if (UnitIsPlayer(unit) or (UnitPlayerControlled(unit) and not UnitIsPlayer(unit))) then
+			local _, class = UnitClass(unit)
+			t = oUF.colors.class[class]
+			self.smoothGradient = {
+				.7,0,0, --  low
+				1,0.5,0, -- middle
+				unpack(t), -- high
+			}
+		elseif(UnitReaction(unit, 'player')) then
+			self.colorReaction = true
+			local _, class = UnitClass(unit)
+			t = oUF.colors.reaction[UnitReaction(unit, 'player')]
+			self.smoothGradient = {
+				.7,0,0, --  low
+				1,0.5,0, -- middle
+				unpack(t), -- high
+			}
+		end
+	end
+
 	bdCore:setBackdrop(self.Health,true)
 	
 	-- Power
@@ -783,7 +810,7 @@ function unitframes.Layout(self,unit)
 	self.Buffs:SetSize(140, 40)
 	self.Buffs.size = 18
 	self.Buffs:EnableMouse(false)
-	self.Buffs.disableMouse = true
+	-- self.Buffs.disableMouse = true
 	self.Buffs.initialAnchor  = "BOTTOMLEFT"
 	self.Buffs.spacing = 2
 	self.Buffs.num = 20
@@ -1000,7 +1027,7 @@ oUF:Factory(function(self)
 		if (i == 1) then
 			bossanchor.boss[i]:SetPoint("TOP", bossanchor, "TOP", 0, 0)
 		else
-			bossanchor.boss[i]:SetPoint("TOP", bossanchor.boss[i-1], "BOTTOM", 0, -60)
+			bossanchor.boss[i]:SetPoint("TOP", bossanchor.boss[i-1], "BOTTOM", 0, config.bossheight)
 		end
 		bossanchor.boss[i]:SetSize(config.bosswidth, config.bossheight)
 	end
