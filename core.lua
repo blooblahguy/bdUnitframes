@@ -909,7 +909,7 @@ function unitframes.Layout(self,unit)
 		local hp, hpMax = UnitHealth(unit), UnitHealthMax(unit)
 		local hpPercent = hp / hpMax
 		if hpMax == 0 then return end
-		return numberize(hp).." - "..round(hpPercent * 100,2);
+		return numberize(hp).." - "..bdCore:round(hpPercent * 100,2);
 	end
 
 	oUF.Tags.Events["status"] = "UNIT_HEALTH  UNIT_CONNECTION  CHAT_MSG_SYSTEM"
