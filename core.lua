@@ -45,7 +45,7 @@ defaults[#defaults+1] = {tab = {
 defaults[#defaults+1] = {textlocation = {
 	type = "dropdown",
 	value = "Outside",
-	options = {"Outside","Inside"},
+	options = {"Outside","Inside","Top/Bottom"},
 	label = "Text Location",
 	callback = function() bdCore:triggerEvent("unitframesUpdate") end
 }} 
@@ -67,7 +67,7 @@ defaults[#defaults+1] = {playertargetwidth = {
 }} 
 defaults[#defaults+1] = {playertargetheight = {
 	type = "slider",
-	value = 20,
+	value = 34,
 	label = "Height",
 	step = 2,
 	min = 4,
@@ -76,7 +76,7 @@ defaults[#defaults+1] = {playertargetheight = {
 }} 
 defaults[#defaults+1] = {playertargetpowerheight = {
 	type = "slider",
-	value = 4,
+	value = 3,
 	label = "Power height",
 	step = 1,
 	min = 2,
@@ -282,7 +282,7 @@ unitframes.specific = {
 		-- update function
 		function self:callback()
 			if (not InCombatLockdown()) then
-				self:SetSize(config.playertargetwidth, config.playertargetheight)
+				self:SetSize(config.playertargetwidth, config.playertargetheight + config.playertargetpowerheight)
 			end
 
 			self.Power:SetHeight(config.playertargetpowerheight)
@@ -312,6 +312,17 @@ unitframes.specific = {
 				self.CombatIndicator:SetPoint("RIGHT", self.Health, "RIGHT", -4, 0)
 				self.RestingIndicator:ClearAllPoints()
 				self.RestingIndicator:SetPoint("RIGHT", self.Health, "RIGHT", -4, 0)
+			elseif (config.textlocation == "Top/Bottom") then
+				self.Name:ClearAllPoints()
+				self.Name:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 6, 6)
+				self.Name:SetJustifyH("LEFT")
+				self.Curhp:ClearAllPoints()
+				self.Curhp:SetPoint('TOPRIGHT', self.Health, "BOTTOMRIGHT", -6, -6)
+				self.Curhp:SetJustifyH("RIGHT")
+				self.CombatIndicator:ClearAllPoints()
+				self.CombatIndicator:SetPoint("CENTER", self.Health, "CENTER", 0, 0)
+				self.RestingIndicator:ClearAllPoints()
+				self.RestingIndicator:SetPoint("CENTER", self.Health, "CENTER", 0, 0)
 			else
 				self.Name:ClearAllPoints()
 				self.Name:SetPoint("LEFT", self, "LEFT", 6, 0)
@@ -392,7 +403,7 @@ unitframes.specific = {
 		function self:callback()
 			-- secure for self	
 			if (not InCombatLockdown()) then
-				self:SetSize(config.playertargetwidth, config.playertargetheight)
+				self:SetSize(config.playertargetwidth, config.playertargetheight + config.playertargetpowerheight)
 			end
 
 			self.Power:SetHeight(config.playertargetpowerheight)
@@ -410,6 +421,17 @@ unitframes.specific = {
 				self.CombatIndicator:SetPoint("RIGHT", self.Health, "RIGHT", -4, 0)
 				self.RestingIndicator:ClearAllPoints()
 				self.RestingIndicator:SetPoint("RIGHT", self.Health, "RIGHT", -4, 0)
+			elseif (config.textlocation == "Top/Bottom") then
+				self.Name:ClearAllPoints()
+				self.Name:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", -6, 0)
+				self.Name:SetJustifyH("RIGHT")
+				self.Curhp:ClearAllPoints()
+				self.Curhp:SetPoint('TOPLEFT', self.Health, "BOTTOMLEFT", 6, 0)
+				self.Curhp:SetJustifyH("LEFT")
+				self.CombatIndicator:ClearAllPoints()
+				self.CombatIndicator:SetPoint("CENTER", self.Health, "CENTER", 0, 0)
+				self.RestingIndicator:ClearAllPoints()
+				self.RestingIndicator:SetPoint("CENTER", self.Health, "CENTER", 0, 0)
 			else
 				self.Name:ClearAllPoints()
 				self.Name:SetPoint("RIGHT", self.Health, "RIGHT", -6, 0)
@@ -516,7 +538,7 @@ unitframes.specific = {
 		-- update function
 		function self:callback()
 			if (not InCombatLockdown()) then
-				self:SetSize(config.focuswidth, config.focusheight)
+				self:SetSize(config.focuswidth, config.focusheight + config.focuspower)
 			end
 
 			self.Health:SetSize(config.focuswidth, config.focusheight)
@@ -574,7 +596,7 @@ unitframes.specific = {
 		-- update function
 		function self:callback()
 			if (not InCombatLockdown()) then
-				self:SetSize(config.bosswidth, config.bossheight)
+				self:SetSize(config.bosswidth, config.bossheight + config.bosspower)
 
 				-- boss frame
 				if (config.bossenable) then
@@ -872,13 +894,16 @@ function unitframes.Layout(self,unit)
 	end
 	
 	self.AuraBars.filter = function(element, unit, button, name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll, timeMod, effect1, effect2, effect3)
+		if (not config.bufftrackerstyle == "Aurabars") then return end
+
 		isBossDebuff = isBossDebuff or false
 		nameplateShowAll = nameplateShowAll or false
 		local castByPlayer = caster and UnitIsUnit(caster, "player") or false
-		if (bdCore:filterAura(name, castByPlayer, isBossDebuff, nameplateShowAll, false) and config.bufftrackerstyle == "Aurabars") then
-			if (unitCaster == "player" and duration ~= 0 and duration < 300) then
-				return true 
-			end
+
+		if (bdCore.isBlacklisted(name)) then return false end
+
+		if (castByPlayer and duration ~= 0 and duration < 300) then
+			return true 
 		end
 	end
 	
