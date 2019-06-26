@@ -273,7 +273,11 @@ local bdframes = {}
 local bossanchor = CreateFrame("frame", "bdUF Boss Frame Anchor", UIParent)
 bossanchor:SetPoint("LEFT", UIParent, "LEFT", 20, 80)
 bossanchor:SetSize(200, 50)
-local bordersize = bdConfigLib:GetSave("bdAddons").border or 2
+local bdCoreConfig = bdConfigLib:GetSave("bdAddons")
+local bordersize = bdCoreConfig.border or 2
+if (bdCoreConfig and not bdCoreConfig.forcescale) then
+	bordersize = bdCore.pixel * bordersize
+end
 
 -- local focuscastbarholder = CreateFrame("frame", UIParent, )
 
@@ -761,10 +765,6 @@ function unitframes.Layout(self,unit)
 	self.Health.frequentUpdates = true
 	self.Health.colorTapping = true
 	self.Health.colorDisconnected = true
-	
-
-	
-
 	self.Health.PreUpdate = function(self, unit)
 		-- print(unit)
 		self.colorSmooth = true
@@ -794,8 +794,8 @@ function unitframes.Layout(self,unit)
 	self.Power = CreateFrame("StatusBar", nil, self)
 	self.Power:SetStatusBarTexture(bdCore.media.flat)
 	self.Power:ClearAllPoints()
-	self.Power:SetPoint("BOTTOMLEFT", self.Health, "TOPLEFT",0, bordersize)
-	self.Power:SetPoint("BOTTOMRIGHT", self.Health, "TOPRIGHT",0, bordersize)
+	self.Power:SetPoint("BOTTOMLEFT", self.Health, "TOPLEFT", 0, bordersize)
+	self.Power:SetPoint("BOTTOMRIGHT", self.Health, "TOPRIGHT", 0, bordersize)
 	self.Power:SetHeight(config.playertargetpowerheight)
 	self.Power.frequentUpdates = true
 	self.Power.colorTapping = true
