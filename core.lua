@@ -766,9 +766,9 @@ function unitframes.Layout(self,unit)
 	self.Health.colorTapping = true
 	self.Health.colorDisconnected = true
 	self.Health.PreUpdate = function(self, unit)
-		-- print(unit)
 		self.colorSmooth = true
 		if (UnitIsPlayer(unit) or (UnitPlayerControlled(unit) and not UnitIsPlayer(unit))) then
+			self.colorReaction = false
 			local _, class = UnitClass(unit)
 			t = oUF.colors.class[class]
 			self.smoothGradient = {
