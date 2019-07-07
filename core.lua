@@ -1044,17 +1044,19 @@ oUF:Factory(function(self)
 	bdCore:makeMovable(focus)
 	
 	-- boss
-	bdCore:makeMovable(bossanchor)
+	local lastboss = nil
 	bossanchor.boss = {}
 	for i = 1, 5 do
 		bossanchor.boss[i] = oUF:Spawn("boss"..i, nil)
 		bossanchor.boss[i]:SetParent(bossanchor)
-		if (i == 1) then
-			bossanchor.boss[i]:SetPoint("TOP", bossanchor, "TOP", 0, 0)
+		if (not lastboss) then
+			bossanchor.boss[i]:SetPoint("LEFT", UIParent, "LEFT", 20, 80)
 		else
-			bossanchor.boss[i]:SetPoint("TOP", bossanchor.boss[i-1], "BOTTOM", 0, config.bossheight)
+			bossanchor.boss[i]:SetPoint("TOP", lastboss, "BOTTOM", -2, -50)
 		end
 		bossanchor.boss[i]:SetSize(config.bosswidth, config.bossheight)
+		bdCore:makeMovable(bossanchor.boss[i])
+		lastboss = bossanchor.boss[i]
 	end
 
 	-- trigger config
